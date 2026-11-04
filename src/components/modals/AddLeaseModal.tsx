@@ -57,7 +57,7 @@ export const AddLeaseModal: React.FC = () => {
             </div>
             <div>
               <h3 className="text-sm font-bold text-white">
-                Add Small Mines Agreement (SMA) Lease
+                Add Small Scale Mining (SMA/T) Lease
               </h3>
               <p className="text-[11px] text-slate-400">Directorate General of Mines &amp; Minerals Punjab</p>
             </div>

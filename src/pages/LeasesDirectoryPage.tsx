@@ -75,10 +75,10 @@ export const LeasesDirectoryPage: React.FC = () => {
       <div className="bg-white border border-slate-200 rounded-xl p-5 shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
         <div>
           <h2 className="text-lg sm:text-xl font-bold text-slate-900">
-            SMA Leases Master Directory
+            Small Scale Mining Leases Directory
           </h2>
           <p className="text-xs text-slate-500 mt-0.5">
-            Registered Small Mines Agreement concessions across all Punjab mining districts
+            Directory of 1,836 Small Scale Mining concessions across Punjab — Small Mines Assistance/Titles (SMA/T)
           </p>
         </div>
 

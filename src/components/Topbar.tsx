@@ -30,7 +30,7 @@ export const Topbar: React.FC = () => {
       case 'ledger':
         return { main: 'Hearing Orders & Decisions', sub: 'Post-Hearing Decisions & Penalties Ledger' };
       case 'leases':
-        return { main: 'SMA Leases Directory', sub: 'Master Concession Agreements Database' };
+        return { main: 'Small Scale Mining Leases', sub: 'Directory of 1,836 Registered Small Scale Mining Concessions' };
       case 'analytics':
         return { main: 'Analytics & Reports', sub: 'Compliance Metrics & Disposal Statistics' };
       default:
@@ -64,7 +64,7 @@ export const Topbar: React.FC = () => {
         <div className="flex items-center gap-1.5 text-[11px] text-slate-500 font-medium">
           <span>DGM&amp;M Punjab</span>
           <span>/</span>
-          <span className="text-slate-700">Small Mines Agreements (SMA)</span>
+          <span className="text-slate-700">Small Mines Assistance/Titles (SMA/T)</span>
         </div>
         <h2 className="text-base sm:text-lg font-bold text-slate-900 leading-tight">
           {pageInfo.main}
@@ -98,7 +98,7 @@ export const Topbar: React.FC = () => {
         <button
           onClick={() => setActiveAddLeaseModal(true)}
           className="flex items-center gap-1.5 bg-slate-100 hover:bg-slate-200 text-slate-800 border border-slate-300 px-3 py-1.5 rounded-lg text-xs font-semibold shadow-sm transition-all active:scale-95"
-          title="Register a new Small Mines Agreement lease"
+          title="Register a new Small Scale Mining lease"
         >
           <Plus className="w-3.5 h-3.5" />
           <span className="hidden md:inline">Add Lease</span>

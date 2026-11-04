@@ -2,8 +2,8 @@ import React, { createContext, useContext, useState, useEffect, useMemo } from '
 import { Lease, PersonalHearing, OrderDetails, LeaseStatus, ToastMessage, DecisionCategory } from '../types';
 import { INITIAL_LEASES, INITIAL_HEARINGS } from '../data/seedData';
 
-const STORAGE_KEY_LEASES = 'dgm_sma_portal_leases_v3';
-const STORAGE_KEY_HEARINGS = 'dgm_sma_portal_hearings_v3';
+const STORAGE_KEY_LEASES = 'dgm_sma_portal_leases_v4';
+const STORAGE_KEY_HEARINGS = 'dgm_sma_portal_hearings_v4';
 
 interface PortalContextType {
   leases: Lease[];
@@ -271,7 +271,7 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
 
     addToast({
       type: 'success',
-      title: 'Quasi-Judicial Order Issued',
+      title: 'Order Issued',
       message: `Formal Order ${orderDetails.order_no} recorded and dispatched.`
     });
   };
@@ -322,7 +322,7 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     addToast({
       type: 'info',
       title: 'System Restored',
-      message: 'Initial seeded Small Mines Agreement leases & hearings restored.'
+      message: 'Small Scale Mining leases data restored.'
     });
   };
 

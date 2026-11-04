@@ -103,7 +103,7 @@ export const NoticeDocketModal: React.FC = () => {
           {/* Body Narrative */}
           <div className="space-y-3.5 text-xs sm:text-sm text-justify">
             <p>
-              WHEREAS, you hold a Small Mines Agreement (SMA) lease titled <strong className="font-bold">"{associatedLease?.lease_title}"</strong> for the extraction of <strong className="font-bold">{associatedLease?.mineral_name}</strong> in District <strong className="font-bold">{associatedLease?.district}</strong>, governed under the Punjab Mining Concession Rules 2002.
+              WHEREAS, you hold a Small Scale Mining (SMA/T) lease titled <strong className="font-bold">"{associatedLease?.lease_title}"</strong> for the extraction of <strong className="font-bold">{associatedLease?.mineral_name}</strong> in District <strong className="font-bold">{associatedLease?.district}</strong>, governed under the Punjab Mining Concession Rules 2002.
             </p>
 
             <p>

@@ -46,7 +46,7 @@ export const Sidebar: React.FC = () => {
     },
     {
       id: 'leases',
-      label: 'SMA Leases Directory',
+      label: 'Small Scale Mining Leases',
       icon: Layers,
       iconColor: '#059669',
       iconBg: 'rgba(5, 150, 105, 0.15)',
@@ -92,7 +92,7 @@ export const Sidebar: React.FC = () => {
               DG Mines &amp; Minerals
             </h1>
             <span className="text-[10px] text-slate-400 block leading-tight truncate">
-              SMA Licensing &amp; Hearings
+              Small Mines Assistance/Titles
             </span>
           </div>
 
@@ -102,7 +102,7 @@ export const Sidebar: React.FC = () => {
       {/* Navigation Section Label */}
       <div className="px-4 pt-4 pb-2">
         <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
-          SMA Operations Menu
+          Small Scale Mining (SMA/T)
         </span>
       </div>
 

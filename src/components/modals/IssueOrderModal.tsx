@@ -75,7 +75,7 @@ export const IssueOrderModal: React.FC = () => {
       setPenaltyAmount(0);
       setLeaseStatusUpdate('Suspended');
       setDecisionSummary(
-        `Due to repeated non-compliance regarding ${activeIssueOrderHearing.hearing_purpose}, Small Mines Agreement Lease ${activeIssueOrderHearing.lease_id} is hereby CANCELLED with immediate effect. Security deposit stands forfeited to Government of the Punjab.`
+        `Due to repeated non-compliance regarding ${activeIssueOrderHearing.hearing_purpose}, Small Scale Mining (SMA/T) Lease ${activeIssueOrderHearing.lease_id} is hereby CANCELLED with immediate effect. Security deposit stands forfeited to Government of the Punjab.`
       );
     } else if (category === 'Exonerated/Compliance Accepted') {
       setPenaltyAmount(0);
