@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { usePortal } from '../context/PortalContext';
 import { PersonalHearing } from '../types';
+import { MINING_GALLERY, MiningPhoto } from '../data/miningGallery';
 import { 
   Clock, 
   CheckCircle2, 
@@ -12,10 +13,13 @@ import {
   Search, 
   FileText, 
   Printer, 
-  ShieldAlert, 
   AlertCircle,
   X,
-  FileCheck2
+  Compass,
+  Maximize2,
+  Sparkles,
+  Mountain,
+  Gem
 } from 'lucide-react';
 
 export const DashboardPage: React.FC = () => {
@@ -34,6 +38,9 @@ export const DashboardPage: React.FC = () => {
   const [pipelineView, setPipelineView] = useState<'table' | 'timeline'>('table');
   const [searchQuery, setSearchQuery] = useState('');
   const [districtFilter, setDistrictFilter] = useState('all');
+
+  // Photo Lightbox modal state
+  const [selectedPhoto, setSelectedPhoto] = useState<MiningPhoto | null>(null);
 
   // Adjournment modal
   const [adjournTargetHearing, setAdjournTargetHearing] = useState<PersonalHearing | null>(null);
@@ -77,66 +84,160 @@ export const DashboardPage: React.FC = () => {
   return (
     <div className="space-y-6 max-w-7xl mx-auto px-4 sm:px-6 pt-6">
       
-      {/* Top Welcome / Status Card */}
-      <div className="bg-white border border-slate-200 rounded-xl p-5 shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-        <div>
-          <div className="flex items-center gap-2 mb-1">
-            <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
-            <span className="text-[11px] font-bold uppercase tracking-wider text-emerald-800">
-              Licensing Authority Session Active
-            </span>
+      {/* UNIQUE EXECUTIVE HERO SECTION WITH HD QUARRY & PINK SALT BACKDROP */}
+      <div className="relative rounded-2xl overflow-hidden shadow-md border border-slate-200 bg-slate-900 text-white">
+        {/* HD Background Imagery with Overlay */}
+        <div 
+          className="absolute inset-0 bg-cover bg-center opacity-30 mix-blend-luminosity scale-105"
+          style={{ 
+            backgroundImage: `url('assets/mining/mining_photo_8.jpg'), url('https://images.unsplash.com/photo-1578328819058-b69f3a3b0f6b?auto=format&fit=crop&w=1600&q=80')` 
+          }}
+        ></div>
+        
+        {/* Subtle Dark Gradient Overlay */}
+        <div className="absolute inset-0 bg-gradient-to-r from-slate-950 via-slate-900/90 to-emerald-950/70"></div>
+
+        <div className="relative z-10 p-6 sm:p-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+          <div className="space-y-2 max-w-2xl">
+            <div className="flex items-center gap-2">
+              <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
+              <span className="text-[11px] font-bold uppercase tracking-wider text-emerald-400 bg-emerald-950/80 px-2.5 py-0.5 rounded border border-emerald-500/30">
+                Licensing Authority • DGM&amp;M Punjab
+              </span>
+              <span className="text-xs text-slate-300 hidden sm:inline">
+                Small Mines Agreements (SMA)
+              </span>
+            </div>
+
+            <h1 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
+              Small Scale Mining Hearings &amp; Enforcement
+            </h1>
+
+            <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
+              Monitoring <strong>{leases.length} registered Small Scale Mining concessions</strong> across 10 Punjab mining districts — from the subterranean pink salt formations of Khewra &amp; Warcha to the limestone quarries of the Salt Range &amp; Margalla hills.
+            </p>
+
+            <div className="flex flex-wrap items-center gap-4 pt-2 text-xs text-slate-300">
+              <div className="flex items-center gap-1.5">
+                <Layers className="w-4 h-4 text-emerald-400" />
+                <span><strong>1,836</strong> Total Leases</span>
+              </div>
+              <div className="flex items-center gap-1.5">
+                <Clock className="w-4 h-4 text-sky-400" />
+                <span><strong>{stats.upcomingHearingsCount}</strong> Scheduled Hearings</span>
+              </div>
+              <div className="flex items-center gap-1.5">
+                <Gem className="w-4 h-4 text-rose-400" />
+                <span>Pink Salt, Limestone &amp; Coal Hubs</span>
+              </div>
+            </div>
           </div>
-          <h2 className="text-xl font-bold text-slate-900">
-            Small Mines Personal Hearings &amp; Orders
-          </h2>
-          <p className="text-xs text-slate-500 mt-0.5">
-            Director SMA/T • Directorate General of Mines &amp; Minerals, Punjab
-          </p>
-        </div>
 
-        <div className="flex items-center gap-2.5">
-          <button
-            onClick={() => setActiveCauseListModal(true)}
-            className="flex items-center gap-1.5 bg-white hover:bg-slate-50 text-slate-700 border border-slate-300 px-3.5 py-2 rounded-lg text-xs font-semibold shadow-sm transition-all"
-          >
-            <Printer className="w-3.5 h-3.5 text-slate-600" />
-            <span>Print Cause List</span>
-          </button>
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 w-full md:w-auto flex-shrink-0">
+            <button
+              onClick={() => setActiveCauseListModal(true)}
+              className="flex items-center justify-center gap-2 bg-white/10 hover:bg-white/20 text-white backdrop-blur-md border border-white/20 px-4 py-2.5 rounded-xl text-xs font-bold shadow-sm transition-all"
+            >
+              <Printer className="w-4 h-4" />
+              <span>Print Cause List</span>
+            </button>
 
-          <button
-            onClick={() => setActiveTab('schedule')}
-            className="flex items-center gap-1.5 bg-[#0A6238] hover:bg-[#084e2c] text-white px-4 py-2 rounded-lg text-xs font-bold shadow-sm transition-all"
-          >
-            <Calendar className="w-3.5 h-3.5" />
-            <span>Schedule Hearing</span>
-          </button>
+            <button
+              onClick={() => setActiveTab('schedule')}
+              className="flex items-center justify-center gap-2 bg-[#0A6238] hover:bg-[#084e2c] text-white px-4 py-2.5 rounded-xl text-xs font-bold shadow-lg transition-all border border-emerald-400/40"
+            >
+              <Calendar className="w-4 h-4" />
+              <span>Schedule Hearing</span>
+            </button>
+          </div>
         </div>
       </div>
 
-      {/* 4 KPI SUMMARY CARDS */}
+      {/* FEATURED HD MINING QUARRY & PINK SALT CARDS */}
+      <div>
+        <div className="flex items-center justify-between mb-3">
+          <div className="flex items-center gap-2">
+            <Mountain className="w-4 h-4 text-[#0A6238]" />
+            <h3 className="text-sm font-bold text-slate-900 uppercase tracking-wide">
+              Punjab Mineral Formations &amp; Quarry Field Operations
+            </h3>
+          </div>
+          <span className="text-xs text-slate-500 hidden sm:inline">
+            Click any quarry photo to inspect geological &amp; regulatory profile
+          </span>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          {MINING_GALLERY.map((photo) => (
+            <div
+              key={photo.id}
+              onClick={() => setSelectedPhoto(photo)}
+              className="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-xs hover:shadow-md transition-all cursor-pointer group flex flex-col justify-between"
+            >
+              {/* Photo Frame with Fallback Handling */}
+              <div className="relative h-36 bg-slate-100 overflow-hidden">
+                <img
+                  src={photo.image_url}
+                  alt={photo.title}
+                  onError={(e) => {
+                    // Graceful fallback to HD Unsplash URL
+                    (e.target as HTMLImageElement).src = photo.fallback_url;
+                  }}
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent"></div>
+                
+                <span className="absolute bottom-2 left-2.5 text-[10px] font-bold text-white bg-black/60 backdrop-blur-xs px-2 py-0.5 rounded">
+                  {photo.category}
+                </span>
+
+                <div className="absolute top-2 right-2 w-6 h-6 rounded-full bg-black/40 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                  <Maximize2 className="w-3 h-3" />
+                </div>
+              </div>
+
+              {/* Card Meta */}
+              <div className="p-3.5 space-y-1">
+                <h4 className="text-xs font-bold text-slate-900 line-clamp-1 group-hover:text-emerald-800 transition-colors">
+                  {photo.title}
+                </h4>
+                <p className="text-[11px] text-slate-500 line-clamp-1">
+                  {photo.district}
+                </p>
+                <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-[11px]">
+                  <span className="text-emerald-700 font-semibold text-[10px]">{photo.stats}</span>
+                  <span className="text-slate-400 group-hover:text-slate-600 text-[10px]">View Detail →</span>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* 4 CORE STATUTORY KPI SUMMARY CARDS */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         
         {/* KPI 1: Total Registered SMA Leases */}
         <div 
           onClick={() => setActiveTab('leases')}
-          className="bg-white border border-slate-200 hover:border-slate-300 p-5 rounded-xl shadow-sm transition-all cursor-pointer"
+          className="bg-white border border-slate-200 hover:border-slate-300 p-5 rounded-xl shadow-xs transition-all cursor-pointer"
         >
           <div className="flex items-center justify-between">
             <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
-              Total Leases
+              Total SSM Leases
             </span>
             <div className="w-9 h-9 rounded-lg bg-emerald-50 text-emerald-700 flex items-center justify-center font-bold">
               <Layers className="w-4 h-4" />
             </div>
           </div>
-          <div className="mt-3 flex items-baseline gap-2">
+          <div className="mt-2.5 flex items-baseline gap-2">
             <span className="text-3xl font-extrabold text-slate-900 tracking-tight">
               {stats.totalLeases}
             </span>
-            <span className="text-xs text-slate-400">agreements</span>
+            <span className="text-xs text-slate-500 font-medium">concessions</span>
           </div>
           <div className="mt-3 pt-3 border-t border-slate-100 flex items-center justify-between text-xs">
-            <span className="text-emerald-700 font-semibold">{stats.activeLeases} Active</span>
+            <span className="text-emerald-700 font-bold">{stats.activeLeases} Active</span>
             <span className="text-amber-700 font-semibold">{stats.showCauseLeases} Notice</span>
             <span className="text-rose-700 font-semibold">{stats.suspendedLeases} Suspended</span>
           </div>
@@ -145,7 +246,7 @@ export const DashboardPage: React.FC = () => {
         {/* KPI 2: Scheduled Upcoming Hearings */}
         <div 
           onClick={() => setPipelineView('timeline')}
-          className="bg-white border border-slate-200 hover:border-slate-300 p-5 rounded-xl shadow-sm transition-all cursor-pointer"
+          className="bg-white border border-slate-200 hover:border-slate-300 p-5 rounded-xl shadow-xs transition-all cursor-pointer"
         >
           <div className="flex items-center justify-between">
             <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
@@ -155,7 +256,7 @@ export const DashboardPage: React.FC = () => {
               <Clock className="w-4 h-4" />
             </div>
           </div>
-          <div className="mt-3 flex items-baseline gap-2">
+          <div className="mt-2.5 flex items-baseline gap-2">
             <span className="text-3xl font-extrabold text-slate-900 tracking-tight">
               {stats.upcomingHearingsCount}
             </span>
@@ -172,7 +273,7 @@ export const DashboardPage: React.FC = () => {
         {/* KPI 3: Pending Orders */}
         <div 
           onClick={() => setActiveTab('ledger')}
-          className="bg-white border border-slate-200 hover:border-slate-300 p-5 rounded-xl shadow-sm transition-all cursor-pointer"
+          className="bg-white border border-slate-200 hover:border-slate-300 p-5 rounded-xl shadow-xs transition-all cursor-pointer"
         >
           <div className="flex items-center justify-between">
             <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
@@ -182,14 +283,14 @@ export const DashboardPage: React.FC = () => {
               <Gavel className="w-4 h-4" />
             </div>
           </div>
-          <div className="mt-3 flex items-baseline gap-2">
+          <div className="mt-2.5 flex items-baseline gap-2">
             <span className="text-3xl font-extrabold text-slate-900 tracking-tight">
               {stats.pendingOrdersCount}
             </span>
-            <span className="text-xs text-amber-700 font-medium">awaiting order</span>
+            <span className="text-xs text-amber-700 font-medium">awaiting decision</span>
           </div>
           <div className="mt-3 pt-3 border-t border-slate-100 flex items-center justify-between text-xs">
-            <span className="text-slate-500">Conducted Hearings</span>
+            <span className="text-slate-500">Heard Cases</span>
             {overdueHearings.length > 0 && (
               <span className="text-rose-600 font-bold flex items-center gap-1">
                 <AlertCircle className="w-3.5 h-3.5" />
@@ -199,10 +300,10 @@ export const DashboardPage: React.FC = () => {
           </div>
         </div>
 
-        {/* KPI 4: Orders Finalized This Month */}
+        {/* KPI 4: Decisions This Month */}
         <div 
           onClick={() => setActiveTab('ledger')}
-          className="bg-white border border-slate-200 hover:border-slate-300 p-5 rounded-xl shadow-sm transition-all cursor-pointer"
+          className="bg-white border border-slate-200 hover:border-slate-300 p-5 rounded-xl shadow-xs transition-all cursor-pointer"
         >
           <div className="flex items-center justify-between">
             <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
@@ -212,14 +313,14 @@ export const DashboardPage: React.FC = () => {
               <CheckCircle2 className="w-4 h-4" />
             </div>
           </div>
-          <div className="mt-3 flex items-baseline gap-2">
+          <div className="mt-2.5 flex items-baseline gap-2">
             <span className="text-3xl font-extrabold text-slate-900 tracking-tight">
               {stats.decidedThisMonthCount}
             </span>
-            <span className="text-xs text-emerald-700 font-medium">orders issued</span>
+            <span className="text-xs text-emerald-700 font-medium">written orders</span>
           </div>
           <div className="mt-3 pt-3 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500">
-            <span>Fines / Penalties:</span>
+            <span>Fines Assessed:</span>
             <span className="font-bold text-slate-800">
               PKR {(stats.totalPenaltiesImposed / 1000000).toFixed(2)}M
             </span>
@@ -239,15 +340,15 @@ export const DashboardPage: React.FC = () => {
             <div className="flex-1 min-w-0">
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <h3 className="text-xs sm:text-sm font-bold text-amber-900">
-                  Action Required: {overdueHearings.length} Hearing{overdueHearings.length > 1 ? 's' : ''} Exceeded 7-Day Order Timeline
+                  Action Required: {overdueHearings.length} Personal Hearing{overdueHearings.length > 1 ? 's' : ''} Exceeded Statutory 7-Day Order Timeline
                 </h3>
                 <span className="text-[11px] font-semibold text-amber-800">
-                  Punjab Mining Concession Rules 2002
+                  Rule 52 (PMR 2002)
                 </span>
               </div>
 
               <p className="text-xs text-amber-800/90 mt-1 leading-relaxed">
-                The following hearings were conducted more than 7 days ago and still have no formal order recorded. Please record determination:
+                The following hearings were conducted more than 7 days ago and still have no written order recorded. Please issue determination:
               </p>
 
               {/* Overdue items list */}
@@ -268,7 +369,7 @@ export const DashboardPage: React.FC = () => {
                           <span className="text-slate-500">({lease?.district})</span>
                         </div>
                         <p className="text-slate-600 text-[11px] mt-0.5">
-                          Matter: <strong className="text-slate-800">{hearing.hearing_purpose}</strong>
+                          Lease: <span className="font-mono font-semibold text-slate-800">{hearing.lease_id}</span> • Matter: <strong className="text-slate-800">{hearing.hearing_purpose}</strong>
                         </p>
                       </div>
 
@@ -279,7 +380,7 @@ export const DashboardPage: React.FC = () => {
 
                         <button
                           onClick={() => setActiveIssueOrderHearing(hearing)}
-                          className="bg-[#D97706] hover:bg-[#b45309] text-white font-bold px-3 py-1.5 rounded-lg text-xs transition-colors"
+                          className="bg-[#D97706] hover:bg-[#b45309] text-white font-bold px-3 py-1.5 rounded-lg text-xs transition-colors shadow-xs"
                         >
                           Record Order
                         </button>
@@ -307,7 +408,7 @@ export const DashboardPage: React.FC = () => {
               </span>
             </h3>
             <p className="text-xs text-slate-500 mt-0.5">
-              Personal hearings scheduled for lessees in chronological order
+              Personal hearings scheduled for Small Scale Mining lessees in chronological order
             </p>
           </div>
 
@@ -538,6 +639,54 @@ export const DashboardPage: React.FC = () => {
         )}
 
       </div>
+
+      {/* HD PHOTO LIGHTBOX MODAL */}
+      {selectedPhoto && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm no-print">
+          <div className="bg-white rounded-2xl w-full max-w-2xl overflow-hidden shadow-2xl border border-slate-300 animate-in zoom-in-95 duration-200">
+            <div className="relative h-72 sm:h-80 bg-slate-900">
+              <img
+                src={selectedPhoto.image_url}
+                alt={selectedPhoto.title}
+                onError={(e) => {
+                  (e.target as HTMLImageElement).src = selectedPhoto.fallback_url;
+                }}
+                className="w-full h-full object-cover"
+              />
+              <button
+                onClick={() => setSelectedPhoto(null)}
+                className="absolute top-3 right-3 w-8 h-8 rounded-full bg-black/60 hover:bg-black text-white flex items-center justify-center"
+              >
+                <X className="w-4 h-4" />
+              </button>
+              <div className="absolute bottom-3 left-3 bg-black/70 backdrop-blur-xs text-white px-3 py-1 rounded-lg text-xs font-bold">
+                {selectedPhoto.category} • {selectedPhoto.district}
+              </div>
+            </div>
+
+            <div className="p-5 space-y-3">
+              <div>
+                <h3 className="text-base font-bold text-slate-900">{selectedPhoto.title}</h3>
+                <p className="text-xs text-emerald-800 font-semibold">{selectedPhoto.stats}</p>
+              </div>
+
+              <p className="text-xs text-slate-600 leading-relaxed">
+                {selectedPhoto.description}
+              </p>
+
+              <div className="pt-3 border-t border-slate-100 flex items-center justify-between text-xs">
+                <span className="text-slate-500">Punjab Mining Cadastre Official Photographic Archive</span>
+                <button
+                  onClick={() => setSelectedPhoto(null)}
+                  className="px-3 py-1 bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold rounded-lg"
+                >
+                  Close Photo
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Adjourn Dialog */}
       {adjournTargetHearing && (

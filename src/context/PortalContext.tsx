@@ -2,8 +2,8 @@ import React, { createContext, useContext, useState, useEffect, useMemo } from '
 import { Lease, PersonalHearing, OrderDetails, LeaseStatus, ToastMessage, DecisionCategory } from '../types';
 import { INITIAL_LEASES, INITIAL_HEARINGS } from '../data/seedData';
 
-const STORAGE_KEY_LEASES = 'dgm_sma_portal_leases_v2';
-const STORAGE_KEY_HEARINGS = 'dgm_sma_portal_hearings_v2';
+const STORAGE_KEY_LEASES = 'dgm_sma_portal_leases_v3';
+const STORAGE_KEY_HEARINGS = 'dgm_sma_portal_hearings_v3';
 
 interface PortalContextType {
   leases: Lease[];

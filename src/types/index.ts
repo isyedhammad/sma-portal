@@ -2,6 +2,8 @@ export type LeaseStatus = 'Active' | 'Suspended' | 'Show-Cause Issued' | 'Expire
 
 export interface Lease {
   lease_id: string; // e.g. "SMA-LHR-2024-089", "SMA-ATK-2023-014"
+  s_no?: number; // e.g. 1 to 1836 from official dataset
+  site_code?: string; // original site name e.g. "ML-ATK-Latrite-Bolianwal Village"
   lease_title: string; // e.g. "Ordinary Sand Block No. 14, Ravi Bed"
   mineral_name: string; // e.g. "Ordinary Sand", "Limestone", "Gypsum", "Silica Sand", "Coal"
   lessee_name: string; // e.g. "M/s Indus Valley Mineral Developers"
@@ -11,6 +13,9 @@ export interface Lease {
   tehsil?: string;
   lease_status: LeaseStatus;
   area_acreage: number;
+  area_ha?: number;
+  mining_type?: string; // ML / PL
+  mining_method?: string; // Surface Mining / Under Ground
   coordinates?: string;
   grant_date?: string;
   expiry_date?: string;
