@@ -33,6 +33,8 @@ export const AnalyticsPage: React.FC = () => {
 
   const districtStats = PUNJAB_MINING_DISTRICTS.map(district => {
     const districtLeases = leases.filter(l => l.district === district);
+    const mlCount = districtLeases.filter(l => (l.mining_type || 'ML').toUpperCase() === 'ML').length;
+    const plCount = districtLeases.filter(l => (l.mining_type || '').toUpperCase() === 'PL').length;
     const districtHearings = hearings.filter(h => {
       const l = leases.find(lease => lease.lease_id === h.lease_id);
       return l?.district === district;
@@ -40,6 +42,8 @@ export const AnalyticsPage: React.FC = () => {
     return {
       district,
       leasesCount: districtLeases.length,
+      mlCount,
+      plCount,
       hearingsCount: districtHearings.length,
     };
   }).filter(item => item.leasesCount > 0 || item.hearingsCount > 0)
@@ -239,9 +243,10 @@ export const AnalyticsPage: React.FC = () => {
             {districtStats.map(item => (
               <div key={item.district} className="bg-slate-50 border border-slate-200 rounded-lg p-3">
                 <span className="font-bold text-slate-900 block">{item.district}</span>
+                <span className="text-xs text-slate-500 font-semibold">{item.leasesCount} Concessions</span>
                 <div className="mt-2 pt-2 border-t border-slate-200 flex items-center justify-between text-[11px]">
-                  <span className="text-slate-500">Leases: <strong className="text-slate-800">{item.leasesCount}</strong></span>
-                  <span className="text-slate-500">Hearings: <strong className="text-amber-800">{item.hearingsCount}</strong></span>
+                  <span className="text-emerald-700 font-bold">ML: {item.mlCount}</span>
+                  <span className="text-sky-700 font-bold">PL: {item.plCount}</span>
                 </div>
               </div>
             ))}

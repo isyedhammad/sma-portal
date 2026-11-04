@@ -89,7 +89,7 @@ export const NoticeDocketModal: React.FC = () => {
             <p className="font-bold text-slate-800 uppercase text-[11px]">To,</p>
             <p className="font-bold text-slate-900 text-sm mt-0.5">{associatedLease?.lessee_name || 'The Lessee'}</p>
             <p className="text-slate-700">Attn: {associatedLease?.proprietor_representative || 'Proprietor / Representative'}</p>
-            <p className="text-slate-600">Re: Lease ID <strong className="text-slate-900 font-mono">{activeNoticeDocket.lease_id}</strong> ({associatedLease?.lease_title})</p>
+            <p className="text-slate-600">Re: Concession ID <strong className="text-slate-900 font-mono">{activeNoticeDocket.lease_id}</strong> [{(associatedLease?.mining_type || '').toUpperCase() === 'PL' ? 'Prospecting License (PL)' : 'Mining Lease (ML)'}] ({associatedLease?.lease_title})</p>
             <p className="text-slate-600">District {associatedLease?.district}, Punjab</p>
           </div>
 
@@ -103,7 +103,7 @@ export const NoticeDocketModal: React.FC = () => {
           {/* Body Narrative */}
           <div className="space-y-3.5 text-xs sm:text-sm text-justify">
             <p>
-              WHEREAS, you hold a Small Scale Mining (SMA/T) lease titled <strong className="font-bold">"{associatedLease?.lease_title}"</strong> for the extraction of <strong className="font-bold">{associatedLease?.mineral_name}</strong> in District <strong className="font-bold">{associatedLease?.district}</strong>, governed under the Punjab Mining Concession Rules 2002.
+              WHEREAS, you hold a Small Scale Mining Concession ({(associatedLease?.mining_type || '').toUpperCase() === 'PL' ? 'Prospecting License — PL' : 'Mining Lease — ML'}) titled <strong className="font-bold">"{associatedLease?.lease_title}"</strong> for the extraction of <strong className="font-bold">{associatedLease?.mineral_name}</strong> in District <strong className="font-bold">{associatedLease?.district}</strong>, governed under the Punjab Mining Concession Rules 2002.
             </p>
 
             <p>

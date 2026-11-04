@@ -98,7 +98,7 @@ export const OrderDocumentModal: React.FC = () => {
             <div className="mt-2.5 pt-2.5 border-t border-slate-200">
               <span className="text-slate-500 font-bold uppercase text-[10px] block">Subject Matter:</span>
               <p className="text-slate-900 font-bold">
-                M/s {associatedLease?.lessee_name} • Lease: {associatedLease?.lease_id} ({associatedLease?.mineral_name}, {associatedLease?.district})
+                M/s {associatedLease?.lessee_name} • Concession: {associatedLease?.lease_id} [{(associatedLease?.mining_type || '').toUpperCase() === 'PL' ? 'Prospecting License (PL)' : 'Mining Lease (ML)'}] ({associatedLease?.mineral_name}, {associatedLease?.district})
               </p>
             </div>
           </div>

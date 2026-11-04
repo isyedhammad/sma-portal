@@ -19,7 +19,10 @@ import {
   Plus,
   Clock,
   Gavel,
-  ExternalLink
+  ExternalLink,
+  ShieldCheck,
+  Compass,
+  Pickaxe
 } from 'lucide-react';
 
 export const DashboardPage: React.FC = () => {
@@ -40,11 +43,23 @@ export const DashboardPage: React.FC = () => {
   const [selectedDistrict, setSelectedDistrict] = useState('All');
   const [selectedMineral, setSelectedMineral] = useState('All');
   const [selectedStatus, setSelectedStatus] = useState('All');
+  const [selectedType, setSelectedType] = useState<'All' | 'ML' | 'PL'>('All');
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 15;
 
   // Selected lease modal for quick dossier preview
   const [previewLease, setPreviewLease] = useState<Lease | null>(null);
+
+  // Exact ML and PL counts across the authentic 1,836 concessions
+  const mlCount = useMemo(() => 
+    leases.filter(l => (l.mining_type || 'ML').toUpperCase() === 'ML').length,
+    [leases]
+  );
+
+  const plCount = useMemo(() => 
+    leases.filter(l => (l.mining_type || '').toUpperCase() === 'PL').length,
+    [leases]
+  );
 
   // Dynamic mineral counts from actual 1,836 leases data
   const pinkSaltCount = useMemo(() => 
@@ -120,6 +135,12 @@ export const DashboardPage: React.FC = () => {
   // Filtered Leases
   const filteredLeases = useMemo(() => {
     return leases.filter(lease => {
+      // Concession Type Filter: ML vs PL
+      if (selectedType !== 'All') {
+        const type = (lease.mining_type || 'ML').toUpperCase();
+        if (type !== selectedType) return false;
+      }
+
       if (selectedDistrict !== 'All' && lease.district !== selectedDistrict) {
         return false;
       }
@@ -147,7 +168,7 @@ export const DashboardPage: React.FC = () => {
 
       return true;
     });
-  }, [leases, selectedDistrict, selectedMineral, selectedStatus, searchQuery]);
+  }, [leases, selectedType, selectedDistrict, selectedMineral, selectedStatus, searchQuery]);
 
   // Pagination calculation
   const totalPages = Math.ceil(filteredLeases.length / pageSize) || 1;
@@ -188,16 +209,16 @@ export const DashboardPage: React.FC = () => {
 
             <div className="flex flex-wrap items-center gap-4 pt-2 text-xs text-slate-300">
               <div className="flex items-center gap-1.5">
-                <Layers className="w-4 h-4 text-emerald-400" />
-                <span><strong>{leases.length}</strong> Total Leases</span>
+                <span className="w-2 h-2 rounded-full bg-emerald-400"></span>
+                <span><strong>{mlCount.toLocaleString()}</strong> Mining Leases (ML)</span>
               </div>
               <div className="flex items-center gap-1.5">
-                <MapPin className="w-4 h-4 text-sky-400" />
+                <span className="w-2 h-2 rounded-full bg-sky-400"></span>
+                <span><strong>{plCount.toLocaleString()}</strong> Prospecting Licenses (PL)</span>
+              </div>
+              <div className="flex items-center gap-1.5">
+                <MapPin className="w-3.5 h-3.5 text-amber-400" />
                 <span><strong>10</strong> Mining Districts</span>
-              </div>
-              <div className="flex items-center gap-1.5">
-                <CheckCircle2 className="w-4 h-4 text-emerald-300" />
-                <span><strong>{stats.activeLeases}</strong> Active Mines</span>
               </div>
             </div>
           </div>
@@ -208,7 +229,7 @@ export const DashboardPage: React.FC = () => {
               className="flex items-center justify-center gap-2 bg-white/10 hover:bg-white/20 text-white backdrop-blur-md border border-white/20 px-4 py-2.5 rounded-xl text-xs font-bold shadow-sm transition-all"
             >
               <Plus className="w-4 h-4" />
-              <span>Add Lease</span>
+              <span>Add Concession</span>
             </button>
 
             <button
@@ -222,6 +243,107 @@ export const DashboardPage: React.FC = () => {
         </div>
       </div>
 
+      {/* STATUTORY CONCESSION CLASSIFICATION CARDS: MINING LEASE (ML) & PROSPECTING LICENSE (PL) */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        
+        {/* Card 1: Mining Lease (ML) */}
+        <div 
+          onClick={() => {
+            setSelectedType(selectedType === 'ML' ? 'All' : 'ML');
+            setCurrentPage(1);
+          }}
+          className={`bg-white border rounded-xl p-5 shadow-xs hover:shadow-md transition-all cursor-pointer ${
+            selectedType === 'ML' ? 'border-emerald-600 ring-2 ring-emerald-500/30 bg-emerald-50/20' : 'border-slate-200'
+          }`}
+        >
+          <div className="flex items-start justify-between">
+            <div className="space-y-1">
+              <div className="flex items-center gap-2">
+                <span className="px-2.5 py-0.5 rounded text-[11px] font-extrabold uppercase bg-emerald-100 text-emerald-900 border border-emerald-300">
+                  ML
+                </span>
+                <h3 className="text-base font-extrabold text-slate-900">
+                  Mining Lease (ML)
+                </h3>
+              </div>
+              <p className="text-xs text-slate-500 leading-snug">
+                Exclusive statutory rights granted for commercial mineral extraction, production, and marketing.
+              </p>
+              <p className="text-[11px] font-semibold text-emerald-800">
+                Regulated under Rule 29, Punjab Mining Concession Rules 2002
+              </p>
+            </div>
+
+            <div className="text-right flex-shrink-0 ml-4">
+              <span className="text-3xl font-extrabold text-emerald-800 block">
+                {mlCount.toLocaleString()}
+              </span>
+              <span className="text-[11px] font-bold text-slate-500">
+                {((mlCount / leases.length) * 100).toFixed(1)}% of total
+              </span>
+            </div>
+          </div>
+
+          <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs">
+            <span className="text-slate-600">
+              {selectedType === 'ML' ? 'Currently Filtering Leases Table' : 'Click to filter table to Mining Leases'}
+            </span>
+            <span className="font-bold text-emerald-700">
+              {selectedType === 'ML' ? 'Clear Filter ✕' : 'View All ML →'}
+            </span>
+          </div>
+        </div>
+
+        {/* Card 2: Prospecting License (PL) */}
+        <div 
+          onClick={() => {
+            setSelectedType(selectedType === 'PL' ? 'All' : 'PL');
+            setCurrentPage(1);
+          }}
+          className={`bg-white border rounded-xl p-5 shadow-xs hover:shadow-md transition-all cursor-pointer ${
+            selectedType === 'PL' ? 'border-sky-600 ring-2 ring-sky-500/30 bg-sky-50/20' : 'border-slate-200'
+          }`}
+        >
+          <div className="flex items-start justify-between">
+            <div className="space-y-1">
+              <div className="flex items-center gap-2">
+                <span className="px-2.5 py-0.5 rounded text-[11px] font-extrabold uppercase bg-sky-100 text-sky-900 border border-sky-300">
+                  PL
+                </span>
+                <h3 className="text-base font-extrabold text-slate-900">
+                  Prospecting License (PL)
+                </h3>
+              </div>
+              <p className="text-xs text-slate-500 leading-snug">
+                Statutory authorization to explore, core-drill, sample, and establish commercial mineral viability.
+              </p>
+              <p className="text-[11px] font-semibold text-sky-800">
+                Regulated under Rule 14, Punjab Mining Concession Rules 2002
+              </p>
+            </div>
+
+            <div className="text-right flex-shrink-0 ml-4">
+              <span className="text-3xl font-extrabold text-sky-800 block">
+                {plCount.toLocaleString()}
+              </span>
+              <span className="text-[11px] font-bold text-slate-500">
+                {((plCount / leases.length) * 100).toFixed(1)}% of total
+              </span>
+            </div>
+          </div>
+
+          <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs">
+            <span className="text-slate-600">
+              {selectedType === 'PL' ? 'Currently Filtering Leases Table' : 'Click to filter table to Prospecting Licenses'}
+            </span>
+            <span className="font-bold text-sky-700">
+              {selectedType === 'PL' ? 'Clear Filter ✕' : 'View All PL →'}
+            </span>
+          </div>
+        </div>
+
+      </div>
+
       {/* 4 FEATURED MINERAL CARDS (USING USER'S 4 PICTURES) */}
       <div>
         <div className="flex items-center justify-between mb-3">
@@ -232,7 +354,7 @@ export const DashboardPage: React.FC = () => {
             </h3>
           </div>
           <span className="text-xs text-slate-500 hidden sm:inline">
-            Click any mineral to filter the leases table below
+            Click any mineral to filter the concessions table below
           </span>
         </div>
 
@@ -274,7 +396,7 @@ export const DashboardPage: React.FC = () => {
                       {card.name}
                     </h4>
                     <span className="text-xs font-extrabold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
-                      {card.count} Leases
+                      {card.count} Concessions
                     </span>
                   </div>
                   <p className="text-[11px] text-slate-500">
@@ -298,7 +420,7 @@ export const DashboardPage: React.FC = () => {
         <div className="bg-white border border-slate-200 p-5 rounded-xl shadow-xs">
           <div className="flex items-center justify-between">
             <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
-              Total SSM Leases
+              Total SSM Concessions
             </span>
             <div className="w-9 h-9 rounded-lg bg-emerald-50 text-emerald-700 flex items-center justify-center font-bold">
               <Layers className="w-4 h-4" />
@@ -311,8 +433,8 @@ export const DashboardPage: React.FC = () => {
             <span className="text-xs text-slate-500 font-medium">concessions</span>
           </div>
           <div className="mt-3 pt-3 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500">
-            <span>Punjab Concession Database</span>
-            <span className="font-semibold text-emerald-700">100% Verified</span>
+            <span>ML: <strong className="text-slate-800">{mlCount}</strong></span>
+            <span>PL: <strong className="text-slate-800">{plCount}</strong></span>
           </div>
         </div>
 
@@ -320,7 +442,7 @@ export const DashboardPage: React.FC = () => {
         <div className="bg-white border border-slate-200 p-5 rounded-xl shadow-xs">
           <div className="flex items-center justify-between">
             <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
-              Active Leases
+              Active Concessions
             </span>
             <div className="w-9 h-9 rounded-lg bg-emerald-50 text-emerald-700 flex items-center justify-center font-bold">
               <CheckCircle2 className="w-4 h-4" />
@@ -390,28 +512,62 @@ export const DashboardPage: React.FC = () => {
       <div className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
         
         {/* Table Header Bar */}
-        <div className="p-4 sm:p-5 border-b border-slate-200 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-          <div>
-            <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2">
-              <Layers className="w-4 h-4 text-[#0A6238]" />
-              <span>Small Scale Mining Leases Registry</span>
-              <span className="text-xs px-2 py-0.5 rounded-full bg-slate-100 text-slate-700 font-mono font-bold">
-                {filteredLeases.length} of {leases.length}
-              </span>
-            </h3>
-            <p className="text-xs text-slate-500 mt-0.5">
-              Small Mines Assistance/Titles (SMA/T) concessions across all Punjab mining districts
-            </p>
+        <div className="p-4 sm:p-5 border-b border-slate-200 space-y-4">
+          <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+            <div>
+              <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2">
+                <Layers className="w-4 h-4 text-[#0A6238]" />
+                <span>Small Scale Mining Concessions Registry</span>
+                <span className="text-xs px-2 py-0.5 rounded-full bg-slate-100 text-slate-700 font-mono font-bold">
+                  {filteredLeases.length} of {leases.length}
+                </span>
+              </h3>
+              <p className="text-xs text-slate-500 mt-0.5">
+                Small Mines Assistance/Titles (SMA/T) concessions — Mining Leases (ML) and Prospecting Licenses (PL) across Punjab
+              </p>
+            </div>
+
+            {/* Quick Segmented Toggle for ML vs PL */}
+            <div className="flex items-center bg-slate-100 p-1 rounded-xl border border-slate-200 text-xs">
+              <button
+                onClick={() => { setSelectedType('All'); setCurrentPage(1); }}
+                className={`px-3 py-1.5 rounded-lg font-bold transition-all ${
+                  selectedType === 'All' ? 'bg-white text-slate-900 shadow-xs' : 'text-slate-600 hover:text-slate-900'
+                }`}
+              >
+                All Concessions ({leases.length})
+              </button>
+
+              <button
+                onClick={() => { setSelectedType('ML'); setCurrentPage(1); }}
+                className={`px-3 py-1.5 rounded-lg font-bold transition-all flex items-center gap-1.5 ${
+                  selectedType === 'ML' ? 'bg-[#0A6238] text-white shadow-xs' : 'text-slate-600 hover:text-slate-900'
+                }`}
+              >
+                <span className="w-2 h-2 rounded-full bg-emerald-400"></span>
+                <span>Mining Lease - ML ({mlCount})</span>
+              </button>
+
+              <button
+                onClick={() => { setSelectedType('PL'); setCurrentPage(1); }}
+                className={`px-3 py-1.5 rounded-lg font-bold transition-all flex items-center gap-1.5 ${
+                  selectedType === 'PL' ? 'bg-[#0284C7] text-white shadow-xs' : 'text-slate-600 hover:text-slate-900'
+                }`}
+              >
+                <span className="w-2 h-2 rounded-full bg-sky-300"></span>
+                <span>Prospecting License - PL ({plCount})</span>
+              </button>
+            </div>
           </div>
 
-          {/* Quick Filters */}
-          <div className="flex items-center gap-2 flex-wrap w-full md:w-auto">
+          {/* Quick Filters Row */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5 pt-1">
             {/* Search */}
-            <div className="relative flex-1 sm:w-64">
+            <div className="relative">
               <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
               <input
                 type="text"
-                placeholder="Search lease ID, company, mineral..."
+                placeholder="Search ID, company, title..."
                 value={searchQuery}
                 onChange={(e) => {
                   setSearchQuery(e.target.value);
@@ -430,10 +586,13 @@ export const DashboardPage: React.FC = () => {
               }}
               className="bg-slate-50 border border-slate-200 rounded-lg px-2.5 py-1.5 text-xs text-slate-700 focus:outline-none focus:border-emerald-600"
             >
-              <option value="All">All Districts</option>
-              {PUNJAB_MINING_DISTRICTS.map(d => (
-                <option key={d} value={d}>{d}</option>
-              ))}
+              <option value="All">All Districts ({leases.length})</option>
+              {PUNJAB_MINING_DISTRICTS.map(d => {
+                const count = leases.filter(l => l.district === d).length;
+                return (
+                  <option key={d} value={d}>{d} ({count})</option>
+                );
+              })}
             </select>
 
             {/* Mineral Filter */}
@@ -446,10 +605,10 @@ export const DashboardPage: React.FC = () => {
               className="bg-slate-50 border border-slate-200 rounded-lg px-2.5 py-1.5 text-xs text-slate-700 focus:outline-none focus:border-emerald-600"
             >
               <option value="All">All Minerals</option>
-              <option value="salt">Pink Salt</option>
-              <option value="coal">Coal</option>
-              <option value="limestone">Limestone</option>
-              <option value="sand">Sand / Silica Sand</option>
+              <option value="salt">Pink Salt ({pinkSaltCount})</option>
+              <option value="coal">Coal ({coalCount})</option>
+              <option value="limestone">Limestone &amp; Stone ({limestoneCount})</option>
+              <option value="sand">Sand &amp; Silica Sand ({sandCount})</option>
               <option value="gypsum">Gypsum</option>
               <option value="fireclay">Fireclay</option>
               <option value="iron">Iron Ore</option>
@@ -465,10 +624,10 @@ export const DashboardPage: React.FC = () => {
               className="bg-slate-50 border border-slate-200 rounded-lg px-2.5 py-1.5 text-xs text-slate-700 focus:outline-none focus:border-emerald-600"
             >
               <option value="All">All Statuses</option>
-              <option value="Active">Active</option>
-              <option value="Show-Cause Issued">Show-Cause Issued</option>
-              <option value="Suspended">Suspended</option>
-              <option value="Expired">Expired</option>
+              <option value="Active">Active ({stats.activeLeases})</option>
+              <option value="Show-Cause Issued">Show-Cause Issued ({stats.showCauseLeases})</option>
+              <option value="Suspended">Suspended ({stats.suspendedLeases})</option>
+              <option value="Expired">Expired ({stats.expiredLeases})</option>
             </select>
           </div>
         </div>
@@ -478,7 +637,8 @@ export const DashboardPage: React.FC = () => {
           <table className="w-full text-left border-collapse text-xs">
             <thead>
               <tr className="bg-slate-50 border-b border-slate-200 text-[11px] font-bold text-slate-600 uppercase tracking-wider">
-                <th className="py-3 px-4">Lease ID &amp; Type</th>
+                <th className="py-3 px-4">Lease Identifier</th>
+                <th className="py-3 px-4">Concession Type</th>
                 <th className="py-3 px-4">Concession Title</th>
                 <th className="py-3 px-4">Mineral</th>
                 <th className="py-3 px-4">Lessee / Company</th>
@@ -491,99 +651,124 @@ export const DashboardPage: React.FC = () => {
             <tbody className="divide-y divide-slate-100">
               {paginatedLeases.length === 0 ? (
                 <tr>
-                  <td colSpan={8} className="py-12 text-center text-slate-500">
-                    <p className="text-sm font-semibold">No Small Scale Mining leases match your search filters.</p>
+                  <td colSpan={9} className="py-12 text-center text-slate-500">
+                    <p className="text-sm font-semibold">No Small Scale Mining concessions match your search filters.</p>
                     <p className="text-xs text-slate-400 mt-1">Try clearing the search query or changing district/mineral filters.</p>
                   </td>
                 </tr>
               ) : (
-                paginatedLeases.map((lease) => (
-                  <tr key={lease.lease_id} className="hover:bg-slate-50/80 transition-colors">
-                    
-                    {/* Lease ID */}
-                    <td className="py-3 px-4 font-mono font-bold text-slate-900 whitespace-nowrap">
-                      <div className="flex items-center gap-1.5">
-                        <span>{lease.lease_id}</span>
-                        <span className="text-[10px] font-normal px-1.5 py-0.2 rounded bg-slate-100 text-slate-600 border border-slate-200">
-                          {lease.mining_type || 'ML'}
-                        </span>
-                      </div>
-                    </td>
-
-                    {/* Title */}
-                    <td className="py-3 px-4 max-w-xs font-semibold text-slate-800">
-                      <div className="truncate" title={lease.lease_title}>
-                        {lease.lease_title}
-                      </div>
-                    </td>
-
-                    {/* Mineral */}
-                    <td className="py-3 px-4 whitespace-nowrap font-medium text-slate-700">
-                      <span className="inline-flex items-center px-2 py-0.5 rounded text-[11px] bg-slate-100 text-slate-800 border border-slate-200">
-                        {lease.mineral_name}
-                      </span>
-                    </td>
-
-                    {/* Lessee Name */}
-                    <td className="py-3 px-4 max-w-xs text-slate-700">
-                      <div className="truncate font-medium" title={lease.lessee_name}>
-                        {lease.lessee_name}
-                      </div>
-                      {lease.proprietor_representative && (
-                        <div className="text-[10px] text-slate-400 truncate">
-                          Rep: {lease.proprietor_representative}
+                paginatedLeases.map((lease) => {
+                  const isPL = (lease.mining_type || '').toUpperCase() === 'PL';
+                  return (
+                    <tr key={lease.lease_id} className="hover:bg-slate-50/80 transition-colors">
+                      
+                      {/* Lease ID */}
+                      <td className="py-3 px-4 font-mono font-bold text-slate-900 whitespace-nowrap">
+                        <div className="flex items-center gap-1.5">
+                          <span>{lease.lease_id}</span>
+                          {lease.s_no && (
+                            <span className="text-[10px] text-slate-400 font-normal">
+                              #{lease.s_no}
+                            </span>
+                          )}
                         </div>
-                      )}
-                    </td>
+                      </td>
 
-                    {/* District */}
-                    <td className="py-3 px-4 whitespace-nowrap text-slate-700 font-medium">
-                      {lease.district}
-                    </td>
+                      {/* Concession Type: Mining Lease (ML) vs Prospecting License (PL) */}
+                      <td className="py-3 px-4 whitespace-nowrap">
+                        {isPL ? (
+                          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] font-bold bg-sky-50 text-sky-800 border border-sky-300">
+                            <span className="w-1.5 h-1.5 rounded-full bg-sky-500"></span>
+                            <span>Prospecting License (PL)</span>
+                          </span>
+                        ) : (
+                          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] font-bold bg-emerald-50 text-emerald-800 border border-emerald-300">
+                            <span className="w-1.5 h-1.5 rounded-full bg-emerald-600"></span>
+                            <span>Mining Lease (ML)</span>
+                          </span>
+                        )}
+                      </td>
 
-                    {/* Area Acreage */}
-                    <td className="py-3 px-4 whitespace-nowrap font-mono text-slate-700">
-                      {lease.area_acreage ? `${lease.area_acreage.toLocaleString()} acres` : '—'}
-                    </td>
+                      {/* Title */}
+                      <td className="py-3 px-4 max-w-xs font-semibold text-slate-800">
+                        <div className="truncate" title={lease.lease_title}>
+                          {lease.lease_title}
+                        </div>
+                        {lease.site_code && lease.site_code !== lease.lease_title && (
+                          <div className="text-[10px] text-slate-400 truncate font-mono">
+                            {lease.site_code}
+                          </div>
+                        )}
+                      </td>
 
-                    {/* Status Badge */}
-                    <td className="py-3 px-4 whitespace-nowrap">
-                      <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold ${
-                        lease.lease_status === 'Active' ? 'bg-emerald-50 text-emerald-800 border border-emerald-200' :
-                        lease.lease_status === 'Show-Cause Issued' ? 'bg-amber-50 text-amber-800 border border-amber-200' :
-                        'bg-rose-50 text-rose-800 border border-rose-200'
-                      }`}>
-                        <span className={`w-1.5 h-1.5 rounded-full ${
-                          lease.lease_status === 'Active' ? 'bg-emerald-600' :
-                          lease.lease_status === 'Show-Cause Issued' ? 'bg-amber-600' :
-                          'bg-rose-600'
-                        }`}></span>
-                        {lease.lease_status}
-                      </span>
-                    </td>
+                      {/* Mineral */}
+                      <td className="py-3 px-4 whitespace-nowrap font-medium text-slate-700">
+                        <span className="inline-flex items-center px-2 py-0.5 rounded text-[11px] bg-slate-100 text-slate-800 border border-slate-200">
+                          {lease.mineral_name}
+                        </span>
+                      </td>
 
-                    {/* Actions */}
-                    <td className="py-3 px-4 text-right whitespace-nowrap">
-                      <div className="flex items-center justify-end gap-1.5">
-                        <button
-                          onClick={() => setPreviewLease(lease)}
-                          className="px-2.5 py-1 text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded text-xs font-semibold border border-slate-200 transition-colors"
-                          title="View Concession Details"
-                        >
-                          Details
-                        </button>
-                        <button
-                          onClick={() => handleScheduleForLease(lease)}
-                          className="px-2.5 py-1 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 rounded text-xs font-bold border border-emerald-300 transition-colors"
-                          title="Schedule statutory personal hearing against this lease"
-                        >
-                          Schedule Hearing
-                        </button>
-                      </div>
-                    </td>
+                      {/* Lessee Name */}
+                      <td className="py-3 px-4 max-w-xs text-slate-700">
+                        <div className="truncate font-medium" title={lease.lessee_name}>
+                          {lease.lessee_name}
+                        </div>
+                        {lease.proprietor_representative && (
+                          <div className="text-[10px] text-slate-400 truncate">
+                            Rep: {lease.proprietor_representative}
+                          </div>
+                        )}
+                      </td>
 
-                  </tr>
-                ))
+                      {/* District */}
+                      <td className="py-3 px-4 whitespace-nowrap text-slate-700 font-medium">
+                        {lease.district}
+                      </td>
+
+                      {/* Area Acreage */}
+                      <td className="py-3 px-4 whitespace-nowrap font-mono text-slate-700">
+                        {lease.area_acreage ? `${lease.area_acreage.toLocaleString()} acres` : '—'}
+                      </td>
+
+                      {/* Status Badge */}
+                      <td className="py-3 px-4 whitespace-nowrap">
+                        <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold ${
+                          lease.lease_status === 'Active' ? 'bg-emerald-50 text-emerald-800 border border-emerald-200' :
+                          lease.lease_status === 'Show-Cause Issued' ? 'bg-amber-50 text-amber-800 border border-amber-200' :
+                          'bg-rose-50 text-rose-800 border border-rose-200'
+                        }`}>
+                          <span className={`w-1.5 h-1.5 rounded-full ${
+                            lease.lease_status === 'Active' ? 'bg-emerald-600' :
+                            lease.lease_status === 'Show-Cause Issued' ? 'bg-amber-600' :
+                            'bg-rose-600'
+                          }`}></span>
+                          {lease.lease_status}
+                        </span>
+                      </td>
+
+                      {/* Actions */}
+                      <td className="py-3 px-4 text-right whitespace-nowrap">
+                        <div className="flex items-center justify-end gap-1.5">
+                          <button
+                            onClick={() => setPreviewLease(lease)}
+                            className="px-2.5 py-1 text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded text-xs font-semibold border border-slate-200 transition-colors"
+                            title="View Concession Details"
+                          >
+                            Details
+                          </button>
+                          <button
+                            onClick={() => handleScheduleForLease(lease)}
+                            className="px-2.5 py-1 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 rounded text-xs font-bold border border-emerald-300 transition-colors"
+                            title="Schedule statutory personal hearing against this concession"
+                          >
+                            Schedule Hearing
+                          </button>
+                        </div>
+                      </td>
+
+                    </tr>
+                  );
+                })
               )}
             </tbody>
           </table>
@@ -597,6 +782,11 @@ export const DashboardPage: React.FC = () => {
             </span> to <span className="font-bold text-slate-900">
               {Math.min(currentPage * pageSize, filteredLeases.length)}
             </span> of <span className="font-bold text-slate-900">{filteredLeases.length}</span> concessions
+            {selectedType !== 'All' && (
+              <span className="ml-1 text-slate-500 font-semibold">
+                (Filtered by {selectedType === 'ML' ? 'Mining Lease - ML' : 'Prospecting License - PL'})
+              </span>
+            )}
           </div>
 
           <div className="flex items-center gap-2">
@@ -659,7 +849,7 @@ export const DashboardPage: React.FC = () => {
             <div className="max-w-md mx-auto">
               <h4 className="text-sm font-bold text-slate-800">No Personal Hearings Scheduled Yet</h4>
               <p className="text-xs text-slate-500 mt-1">
-                Zero assumed data recorded. As the Licensing Authority (Director SMA/T), you can schedule an official statutory personal hearing against any of the 1,836 Small Scale Mining concessions by clicking below.
+                Zero assumed data recorded. As the Licensing Authority (Director SMA/T), you can schedule an official statutory personal hearing against any Mining Lease (ML) or Prospecting License (PL) by clicking below.
               </p>
             </div>
             <button
@@ -674,6 +864,7 @@ export const DashboardPage: React.FC = () => {
           <div className="divide-y divide-slate-100 pt-3">
             {hearings.map(h => {
               const lease = leases.find(l => l.lease_id === h.lease_id);
+              const isPL = (lease?.mining_type || '').toUpperCase() === 'PL';
               return (
                 <div key={h.hearing_id} className="py-3 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs">
                   <div>
@@ -681,10 +872,14 @@ export const DashboardPage: React.FC = () => {
                       <span className="font-mono font-bold text-slate-900">{h.notice_reference_no}</span>
                       <span className="text-slate-400">•</span>
                       <span className="font-semibold text-slate-800">{lease?.lessee_name}</span>
-                      <span className="text-slate-500">({lease?.district})</span>
+                      <span className={`px-2 py-0.2 rounded text-[10px] font-bold ${
+                        isPL ? 'bg-sky-50 text-sky-800 border border-sky-200' : 'bg-emerald-50 text-emerald-800 border border-emerald-200'
+                      }`}>
+                        {isPL ? 'Prospecting License (PL)' : 'Mining Lease (ML)'}
+                      </span>
                     </div>
                     <p className="text-slate-600 text-[11px] mt-0.5">
-                      Lease: <span className="font-mono font-semibold">{h.lease_id}</span> • Matter: <strong>{h.hearing_purpose}</strong>
+                      Concession: <span className="font-mono font-semibold">{h.lease_id}</span> • Matter: <strong>{h.hearing_purpose}</strong>
                     </p>
                   </div>
 
@@ -722,12 +917,18 @@ export const DashboardPage: React.FC = () => {
             {/* Header */}
             <div className="bg-slate-900 px-6 py-4 flex items-center justify-between text-white">
               <div className="flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-lg bg-emerald-600 flex items-center justify-center text-white font-bold text-xs">
-                  {previewLease.mining_type || 'ML'}
+                <div className={`w-9 h-9 rounded-lg flex items-center justify-center text-white font-bold text-xs ${
+                  (previewLease.mining_type || '').toUpperCase() === 'PL' ? 'bg-sky-600' : 'bg-emerald-600'
+                }`}>
+                  {(previewLease.mining_type || '').toUpperCase() === 'PL' ? 'PL' : 'ML'}
                 </div>
                 <div>
                   <h3 className="text-sm font-bold text-white font-mono">{previewLease.lease_id}</h3>
-                  <p className="text-[11px] text-slate-400">Small Scale Mining Concession Dossier</p>
+                  <p className="text-[11px] text-slate-400">
+                    {(previewLease.mining_type || '').toUpperCase() === 'PL' 
+                      ? 'Prospecting License (PL) Concession Dossier' 
+                      : 'Mining Lease (ML) Concession Dossier'}
+                  </p>
                 </div>
               </div>
 
@@ -744,6 +945,29 @@ export const DashboardPage: React.FC = () => {
               <div>
                 <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Concession Title</span>
                 <p className="text-sm font-bold text-slate-900 mt-0.5">{previewLease.lease_title}</p>
+              </div>
+
+              {/* Concession Classification Box */}
+              <div className="p-3 bg-slate-100/70 border border-slate-200 rounded-xl flex items-center justify-between">
+                <div>
+                  <span className="text-slate-500 font-semibold text-[10px] uppercase block">Statutory Concession Classification</span>
+                  <span className={`inline-block mt-0.5 px-2.5 py-0.5 rounded text-xs font-bold ${
+                    (previewLease.mining_type || '').toUpperCase() === 'PL'
+                      ? 'bg-sky-100 text-sky-900 border border-sky-300'
+                      : 'bg-emerald-100 text-emerald-900 border border-emerald-300'
+                  }`}>
+                    {(previewLease.mining_type || '').toUpperCase() === 'PL' 
+                      ? 'Prospecting License (PL)' 
+                      : 'Mining Lease (ML)'}
+                  </span>
+                </div>
+                <div className="text-right max-w-xs">
+                  <span className="text-[11px] text-slate-600 font-medium block">
+                    {(previewLease.mining_type || '').toUpperCase() === 'PL' 
+                      ? 'Rule 14 (PMR 2002) — Exploration & Sampling' 
+                      : 'Rule 29 (PMR 2002) — Commercial Extraction'}
+                  </span>
+                </div>
               </div>
 
               <div className="grid grid-cols-2 gap-3.5 p-3.5 bg-slate-50 border border-slate-200 rounded-xl">

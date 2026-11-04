@@ -55,6 +55,8 @@ interface PortalContextType {
     suspendedLeases: number;
     showCauseLeases: number;
     expiredLeases: number;
+    mlCount: number;
+    plCount: number;
     upcomingHearingsCount: number;
     pendingOrdersCount: number;
     decidedThisMonthCount: number;
@@ -383,6 +385,9 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     const showCauseLeases = leases.filter(l => l.lease_status === 'Show-Cause Issued').length;
     const expiredLeases = leases.filter(l => l.lease_status === 'Expired').length;
 
+    const mlCount = leases.filter(l => (l.mining_type || '').toUpperCase() === 'ML').length;
+    const plCount = leases.filter(l => (l.mining_type || '').toUpperCase() === 'PL').length;
+
     const upcomingHearingsCount = hearings.filter(h => {
       const hDate = new Date(h.hearing_date);
       return hDate >= now && !h.order_issued && h.hearing_status !== 'Decided';
@@ -412,6 +417,8 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       suspendedLeases,
       showCauseLeases,
       expiredLeases,
+      mlCount,
+      plCount,
       upcomingHearingsCount,
       pendingOrdersCount,
       decidedThisMonthCount,

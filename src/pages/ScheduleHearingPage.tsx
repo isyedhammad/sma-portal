@@ -33,6 +33,7 @@ export const ScheduleHearingPage: React.FC = () => {
   // Selected lease ID
   const [selectedLeaseId, setSelectedLeaseId] = useState<string>(selectedLeaseForHearing?.lease_id || '');
   const [leaseSearchTerm, setLeaseSearchTerm] = useState('');
+  const [concessionTypeFilter, setConcessionTypeFilter] = useState<'All' | 'ML' | 'PL'>('All');
   const [districtFilter, setDistrictFilter] = useState('All');
   const [mineralFilter, setMineralFilter] = useState('All');
   const [isLeaseDropdownOpen, setIsLeaseDropdownOpen] = useState(false);
@@ -107,6 +108,11 @@ export const ScheduleHearingPage: React.FC = () => {
     const term = leaseSearchTerm.trim().toLowerCase();
     
     return leases.filter(l => {
+      // Concession Type filter (ML vs PL)
+      if (concessionTypeFilter !== 'All') {
+        const t = (l.mining_type || 'ML').toUpperCase();
+        if (t !== concessionTypeFilter) return false;
+      }
       // District filter
       if (districtFilter !== 'All' && l.district !== districtFilter) return false;
       // Mineral filter
@@ -200,22 +206,22 @@ export const ScheduleHearingPage: React.FC = () => {
               </span>
             </div>
 
-            {/* Quick Filter Row: District & Mineral */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs bg-slate-50 p-3 rounded-lg border border-slate-200">
+            {/* Quick Filter Row: District, Mineral & Concession Type */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs bg-slate-50 p-3 rounded-lg border border-slate-200">
               <div>
                 <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">
-                  Filter by District Jurisdiction ({PUNJAB_MINING_DISTRICTS.length} Districts)
+                  Filter by District ({PUNJAB_MINING_DISTRICTS.length} Districts)
                 </label>
                 <select
                   value={districtFilter}
                   onChange={(e) => setDistrictFilter(e.target.value)}
                   className="w-full bg-white border border-slate-300 rounded p-1.5 text-xs text-slate-800 focus:outline-none focus:border-emerald-600"
                 >
-                  <option value="All">All Punjab Districts ({leases.length} leases)</option>
+                  <option value="All">All Punjab Districts ({leases.length})</option>
                   {PUNJAB_MINING_DISTRICTS.map(d => {
                     const count = leases.filter(l => l.district === d).length;
                     return (
-                      <option key={d} value={d}>{d} ({count} leases)</option>
+                      <option key={d} value={d}>{d} ({count})</option>
                     );
                   })}
                 </select>
@@ -223,20 +229,35 @@ export const ScheduleHearingPage: React.FC = () => {
 
               <div>
                 <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">
-                  Filter by Mineral Formation
+                  Filter by Mineral
                 </label>
                 <select
                   value={mineralFilter}
                   onChange={(e) => setMineralFilter(e.target.value)}
                   className="w-full bg-white border border-slate-300 rounded p-1.5 text-xs text-slate-800 focus:outline-none focus:border-emerald-600"
                 >
-                  <option value="All">All Mineral Types ({mineralsList.length} minerals)</option>
+                  <option value="All">All Mineral Types ({mineralsList.length})</option>
                   {mineralsList.map(m => {
                     const count = leases.filter(l => l.mineral_name === m).length;
                     return (
                       <option key={m} value={m}>{m} ({count})</option>
                     );
                   })}
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">
+                  Concession Type (ML vs PL)
+                </label>
+                <select
+                  value={concessionTypeFilter}
+                  onChange={(e) => setConcessionTypeFilter(e.target.value as 'All' | 'ML' | 'PL')}
+                  className="w-full bg-white border border-slate-300 rounded p-1.5 text-xs text-slate-800 focus:outline-none focus:border-emerald-600 font-semibold"
+                >
+                  <option value="All">All Concessions (ML &amp; PL)</option>
+                  <option value="ML">Mining Lease - ML (1,250)</option>
+                  <option value="PL">Prospecting License - PL (586)</option>
                 </select>
               </div>
             </div>
@@ -326,9 +347,20 @@ export const ScheduleHearingPage: React.FC = () => {
                           </p>
                         </div>
 
-                        <span className="text-[10px] px-2 py-0.5 rounded-full bg-slate-100 font-semibold flex-shrink-0">
-                          {lease.mining_type || 'ML'} • {lease.lease_status}
-                        </span>
+                        <div className="flex items-center gap-1.5 flex-shrink-0">
+                          {(lease.mining_type || '').toUpperCase() === 'PL' ? (
+                            <span className="text-[10px] px-2 py-0.5 rounded-md font-bold bg-sky-50 text-sky-800 border border-sky-300">
+                              Prospecting License (PL)
+                            </span>
+                          ) : (
+                            <span className="text-[10px] px-2 py-0.5 rounded-md font-bold bg-emerald-50 text-emerald-800 border border-emerald-300">
+                              Mining Lease (ML)
+                            </span>
+                          )}
+                          <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-slate-100 text-slate-700 font-semibold">
+                            {lease.lease_status}
+                          </span>
+                        </div>
                       </div>
                     ))
                   )}
@@ -344,15 +376,41 @@ export const ScheduleHearingPage: React.FC = () => {
                     <Lock className="w-3.5 h-3.5 text-amber-600" />
                     <span>Auto-Populated Concession Information (Locked)</span>
                   </div>
-                  <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-white border border-slate-300">
-                    Status: {selectedLease.lease_status}
-                  </span>
+                  <div className="flex items-center gap-2">
+                    <span className={`text-xs font-bold px-2.5 py-0.5 rounded-md border ${
+                      (selectedLease.mining_type || '').toUpperCase() === 'PL'
+                        ? 'bg-sky-50 text-sky-900 border-sky-300'
+                        : 'bg-emerald-50 text-emerald-900 border-emerald-300'
+                    }`}>
+                      {(selectedLease.mining_type || '').toUpperCase() === 'PL' ? 'Prospecting License (PL)' : 'Mining Lease (ML)'}
+                    </span>
+                    <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-white border border-slate-300">
+                      Status: {selectedLease.lease_status}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Statutory Classification Callout */}
+                <div className="p-2.5 bg-white border border-slate-200 rounded-lg flex items-center justify-between text-xs">
+                  <div>
+                    <span className="text-[10px] font-bold text-slate-400 uppercase block">Concession Legal Nature</span>
+                    <span className="font-bold text-slate-800">
+                      {(selectedLease.mining_type || '').toUpperCase() === 'PL' 
+                        ? 'Prospecting License (PL) — Governed under Rule 14, Punjab Mining Concession Rules 2002'
+                        : 'Mining Lease (ML) — Governed under Rule 29, Punjab Mining Concession Rules 2002'}
+                    </span>
+                  </div>
+                  <div className="text-[11px] text-slate-600 font-medium">
+                    {(selectedLease.mining_type || '').toUpperCase() === 'PL' 
+                      ? 'Exploration, core-drilling, and sampling rights'
+                      : 'Commercial extraction, quarrying, and dispatch rights'}
+                  </div>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 text-xs">
                   <div>
-                    <label className="text-[10px] font-bold text-slate-500 uppercase block mb-0.5">Lease Identifier</label>
-                    <input type="text" readOnly value={`${selectedLease.lease_id} (${selectedLease.mining_type || 'ML'})`} className="w-full bg-white border border-slate-300 rounded p-1.5 text-slate-800 font-mono font-bold text-xs" />
+                    <label className="text-[10px] font-bold text-slate-500 uppercase block mb-0.5">Concession Identifier</label>
+                    <input type="text" readOnly value={`${selectedLease.lease_id}`} className="w-full bg-white border border-slate-300 rounded p-1.5 text-slate-800 font-mono font-bold text-xs" />
                   </div>
                   <div>
                     <label className="text-[10px] font-bold text-slate-500 uppercase block mb-0.5">Site Name / Concession</label>

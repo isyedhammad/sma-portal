@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { usePortal } from '../context/PortalContext';
 import { Lease } from '../types';
 import { PUNJAB_MINING_DISTRICTS } from '../data/seedData';
@@ -9,13 +9,14 @@ import {
   CheckCircle2, 
   Clock, 
   XCircle, 
-  AlertTriangle,
+  AlertTriangle, 
   CalendarPlus, 
   FileText, 
   ChevronDown, 
   ChevronRight, 
   MapPin, 
-  ShieldAlert
+  ShieldAlert,
+  ChevronLeft
 } from 'lucide-react';
 
 export const LeasesDirectoryPage: React.FC = () => {
@@ -34,30 +35,62 @@ export const LeasesDirectoryPage: React.FC = () => {
   const [districtFilter, setDistrictFilter] = useState('All');
   const [mineralFilter, setMineralFilter] = useState('All');
   const [statusFilter, setStatusFilter] = useState('All');
+  const [concessionTypeFilter, setConcessionTypeFilter] = useState<'All' | 'ML' | 'PL'>('All');
   const [expandedLeaseId, setExpandedLeaseId] = useState<string | null>(null);
 
-  const mineralsList = Array.from(new Set(leases.map(l => l.mineral_name))).sort();
+  // Pagination
+  const [currentPage, setCurrentPage] = useState(1);
+  const pageSize = 25;
 
-  const filteredLeases = leases.filter(lease => {
-    if (districtFilter !== 'All' && lease.district !== districtFilter) return false;
-    if (mineralFilter !== 'All' && lease.mineral_name !== mineralFilter) return false;
-    if (statusFilter !== 'All' && lease.lease_status !== statusFilter) return false;
+  const mlCount = useMemo(() => 
+    leases.filter(l => (l.mining_type || 'ML').toUpperCase() === 'ML').length,
+    [leases]
+  );
 
-    if (searchQuery.trim()) {
-      const q = searchQuery.toLowerCase();
-      const matchId = lease.lease_id.toLowerCase().includes(q);
-      const matchTitle = lease.lease_title.toLowerCase().includes(q);
-      const matchLessee = lease.lessee_name.toLowerCase().includes(q);
-      const matchProprietor = lease.proprietor_representative.toLowerCase().includes(q);
-      const matchMineral = lease.mineral_name.toLowerCase().includes(q);
-      const matchDistrict = lease.district.toLowerCase().includes(q);
-      if (!matchId && !matchTitle && !matchLessee && !matchProprietor && !matchMineral && !matchDistrict) {
-        return false;
+  const plCount = useMemo(() => 
+    leases.filter(l => (l.mining_type || '').toUpperCase() === 'PL').length,
+    [leases]
+  );
+
+  const mineralsList = useMemo(() => 
+    Array.from(new Set(leases.map(l => l.mineral_name))).sort(),
+    [leases]
+  );
+
+  const filteredLeases = useMemo(() => {
+    return leases.filter(lease => {
+      // Concession Type Filter: ML vs PL
+      if (concessionTypeFilter !== 'All') {
+        const type = (lease.mining_type || 'ML').toUpperCase();
+        if (type !== concessionTypeFilter) return false;
       }
-    }
 
-    return true;
-  });
+      if (districtFilter !== 'All' && lease.district !== districtFilter) return false;
+      if (mineralFilter !== 'All' && lease.mineral_name !== mineralFilter) return false;
+      if (statusFilter !== 'All' && lease.lease_status !== statusFilter) return false;
+
+      if (searchQuery.trim()) {
+        const q = searchQuery.toLowerCase();
+        const matchId = lease.lease_id.toLowerCase().includes(q);
+        const matchTitle = lease.lease_title.toLowerCase().includes(q);
+        const matchLessee = lease.lessee_name.toLowerCase().includes(q);
+        const matchProprietor = lease.proprietor_representative.toLowerCase().includes(q);
+        const matchMineral = lease.mineral_name.toLowerCase().includes(q);
+        const matchDistrict = lease.district.toLowerCase().includes(q);
+        if (!matchId && !matchTitle && !matchLessee && !matchProprietor && !matchMineral && !matchDistrict) {
+          return false;
+        }
+      }
+
+      return true;
+    });
+  }, [leases, concessionTypeFilter, districtFilter, mineralFilter, statusFilter, searchQuery]);
+
+  const totalPages = Math.ceil(filteredLeases.length / pageSize) || 1;
+  const paginatedLeases = useMemo(() => {
+    const start = (currentPage - 1) * pageSize;
+    return filteredLeases.slice(start, start + pageSize);
+  }, [filteredLeases, currentPage, pageSize]);
 
   const toggleExpand = (leaseId: string) => {
     setExpandedLeaseId(prev => prev === leaseId ? null : leaseId);
@@ -75,7 +108,7 @@ export const LeasesDirectoryPage: React.FC = () => {
       <div className="bg-white border border-slate-200 rounded-xl p-5 shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
         <div>
           <h2 className="text-lg sm:text-xl font-bold text-slate-900">
-            Small Scale Mining Leases Directory
+            Small Scale Mining Concessions Directory
           </h2>
           <p className="text-xs text-slate-500 mt-0.5">
             Directory of 1,836 Small Scale Mining concessions across Punjab — Small Mines Assistance/Titles (SMA/T)
@@ -87,7 +120,55 @@ export const LeasesDirectoryPage: React.FC = () => {
           className="flex items-center gap-1.5 bg-[#0A6238] hover:bg-[#084e2c] text-white font-bold px-3.5 py-2 rounded-lg text-xs shadow-sm transition-all"
         >
           <Plus className="w-3.5 h-3.5" />
-          <span>Add New Lease</span>
+          <span>Add New Concession</span>
+        </button>
+      </div>
+
+      {/* QUICK SEGMENTED TOGGLE FOR ML (MINING LEASE) VS PL (PROSPECTING LICENSE) */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+        <button
+          onClick={() => { setConcessionTypeFilter('All'); setCurrentPage(1); }}
+          className={`p-3.5 rounded-xl border text-left transition-all ${
+            concessionTypeFilter === 'All' 
+              ? 'bg-slate-900 text-white border-slate-900 shadow-sm' 
+              : 'bg-white text-slate-700 border-slate-200 hover:border-slate-300'
+          }`}
+        >
+          <span className="text-[10px] font-bold uppercase tracking-wider block opacity-75">All Concessions</span>
+          <div className="flex items-baseline justify-between mt-1">
+            <span className="text-xl font-extrabold">{leases.length.toLocaleString()}</span>
+            <span className="text-xs opacity-75">100% Registry</span>
+          </div>
+        </button>
+
+        <button
+          onClick={() => { setConcessionTypeFilter('ML'); setCurrentPage(1); }}
+          className={`p-3.5 rounded-xl border text-left transition-all ${
+            concessionTypeFilter === 'ML' 
+              ? 'bg-[#0A6238] text-white border-[#0A6238] shadow-sm' 
+              : 'bg-white text-slate-700 border-slate-200 hover:border-emerald-400'
+          }`}
+        >
+          <span className="text-[10px] font-bold uppercase tracking-wider block opacity-90">Mining Lease (ML)</span>
+          <div className="flex items-baseline justify-between mt-1">
+            <span className="text-xl font-extrabold">{mlCount.toLocaleString()}</span>
+            <span className="text-xs opacity-90">Commercial Extraction</span>
+          </div>
+        </button>
+
+        <button
+          onClick={() => { setConcessionTypeFilter('PL'); setCurrentPage(1); }}
+          className={`p-3.5 rounded-xl border text-left transition-all ${
+            concessionTypeFilter === 'PL' 
+              ? 'bg-[#0284C7] text-white border-[#0284C7] shadow-sm' 
+              : 'bg-white text-slate-700 border-slate-200 hover:border-sky-400'
+          }`}
+        >
+          <span className="text-[10px] font-bold uppercase tracking-wider block opacity-90">Prospecting License (PL)</span>
+          <div className="flex items-baseline justify-between mt-1">
+            <span className="text-xl font-extrabold">{plCount.toLocaleString()}</span>
+            <span className="text-xs opacity-90">Exploration &amp; Sampling</span>
+          </div>
         </button>
       </div>
 
@@ -97,7 +178,7 @@ export const LeasesDirectoryPage: React.FC = () => {
           
           <div className="relative">
             <label className="text-[10px] font-semibold text-slate-500 uppercase block mb-1">
-              Search Leases
+              Search Concessions
             </label>
             <div className="relative">
               <Search className="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-1/2 -translate-y-1/2" />
@@ -105,7 +186,10 @@ export const LeasesDirectoryPage: React.FC = () => {
                 type="text"
                 placeholder="ID, Company, Mineral..."
                 value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
+                onChange={(e) => {
+                  setSearchQuery(e.target.value);
+                  setCurrentPage(1);
+                }}
                 className="w-full bg-slate-50 border border-slate-300 rounded-lg pl-8 pr-2.5 py-1.5 text-slate-800 focus:outline-none focus:border-emerald-600 focus:bg-white"
               />
             </div>
@@ -117,7 +201,10 @@ export const LeasesDirectoryPage: React.FC = () => {
             </label>
             <select
               value={districtFilter}
-              onChange={(e) => setDistrictFilter(e.target.value)}
+              onChange={(e) => {
+                setDistrictFilter(e.target.value);
+                setCurrentPage(1);
+              }}
               className="w-full bg-slate-50 border border-slate-300 rounded-lg px-2.5 py-1.5 text-slate-800 focus:outline-none focus:border-emerald-600 focus:bg-white"
             >
               <option value="All">All Districts</option>
@@ -133,7 +220,10 @@ export const LeasesDirectoryPage: React.FC = () => {
             </label>
             <select
               value={mineralFilter}
-              onChange={(e) => setMineralFilter(e.target.value)}
+              onChange={(e) => {
+                setMineralFilter(e.target.value);
+                setCurrentPage(1);
+              }}
               className="w-full bg-slate-50 border border-slate-300 rounded-lg px-2.5 py-1.5 text-slate-800 focus:outline-none focus:border-emerald-600 focus:bg-white"
             >
               <option value="All">All Minerals</option>
@@ -149,7 +239,10 @@ export const LeasesDirectoryPage: React.FC = () => {
             </label>
             <select
               value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value)}
+              onChange={(e) => {
+                setStatusFilter(e.target.value);
+                setCurrentPage(1);
+              }}
               className="w-full bg-slate-50 border border-slate-300 rounded-lg px-2.5 py-1.5 text-slate-800 focus:outline-none focus:border-emerald-600 focus:bg-white"
             >
               <option value="All">All Statuses</option>
@@ -166,19 +259,27 @@ export const LeasesDirectoryPage: React.FC = () => {
       {/* LEASES DATA LIST */}
       <div className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
         
-        <div className="p-3.5 border-b border-slate-200 flex items-center justify-between text-xs text-slate-500">
-          <span>Found <strong className="text-slate-900">{filteredLeases.length}</strong> leases</span>
+        <div className="p-3.5 border-b border-slate-200 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 text-xs text-slate-500">
+          <div>
+            Found <strong className="text-slate-900">{filteredLeases.length}</strong> concessions
+            {concessionTypeFilter !== 'All' && (
+              <span className="ml-1 text-slate-600 font-semibold">
+                — {concessionTypeFilter === 'ML' ? 'Mining Lease (ML)' : 'Prospecting License (PL)'}
+              </span>
+            )}
+          </div>
           <span className="text-[11px] text-slate-400">Click any row to expand compliance record</span>
         </div>
 
         <div className="divide-y divide-slate-100">
-          {filteredLeases.length === 0 ? (
+          {paginatedLeases.length === 0 ? (
             <div className="py-10 text-center text-slate-500 text-xs">
-              No matching SMA leases found.
+              No matching concessions found for your search filters.
             </div>
           ) : (
-            filteredLeases.map(lease => {
+            paginatedLeases.map(lease => {
               const isExpanded = expandedLeaseId === lease.lease_id;
+              const isPL = (lease.mining_type || '').toUpperCase() === 'PL';
               const linkedHearings = hearings.filter(h => h.lease_id === lease.lease_id);
               const activePendingHearing = linkedHearings.find(h => !h.order_issued && h.hearing_status !== 'Decided');
 
@@ -196,11 +297,25 @@ export const LeasesDirectoryPage: React.FC = () => {
                       </div>
 
                       <div className="flex-1 min-w-0">
-                        <div className="flex flex-wrap items-center gap-2 mb-0.5">
+                        <div className="flex flex-wrap items-center gap-2 mb-1">
                           <span className="font-mono font-bold text-slate-900 text-xs bg-slate-100 px-2 py-0.5 rounded border border-slate-200">
                             {lease.lease_id}
                           </span>
-                          <span className="text-xs font-semibold text-slate-700">
+
+                          {/* Distinct Badge for ML vs PL */}
+                          {isPL ? (
+                            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md text-[10px] font-bold bg-sky-50 text-sky-800 border border-sky-300">
+                              <span className="w-1.5 h-1.5 rounded-full bg-sky-500"></span>
+                              <span>Prospecting License (PL)</span>
+                            </span>
+                          ) : (
+                            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md text-[10px] font-bold bg-emerald-50 text-emerald-800 border border-emerald-300">
+                              <span className="w-1.5 h-1.5 rounded-full bg-emerald-600"></span>
+                              <span>Mining Lease (ML)</span>
+                            </span>
+                          )}
+
+                          <span className="text-xs font-semibold text-slate-700 bg-slate-100 px-2 py-0.5 rounded">
                             {lease.mineral_name}
                           </span>
 
@@ -270,6 +385,19 @@ export const LeasesDirectoryPage: React.FC = () => {
                   {/* Expandable Case History */}
                   {isExpanded && (
                     <div className="bg-slate-50/80 border-t border-slate-200 p-4 space-y-3">
+                      {/* Concession Statutory Details */}
+                      <div className="p-3 bg-white rounded-lg border border-slate-200 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 text-xs">
+                        <div>
+                          <span className="text-[10px] font-bold text-slate-400 uppercase block">Concession Classification</span>
+                          <span className="font-bold text-slate-900">
+                            {isPL ? 'Prospecting License (PL) — Rule 14, PMR 2002' : 'Mining Lease (ML) — Rule 29, PMR 2002'}
+                          </span>
+                        </div>
+                        <div className="text-slate-600">
+                          {isPL ? 'Mineral Exploration, Drilling & Trenching Rights' : 'Commercial Mineral Production & Marketing Rights'}
+                        </div>
+                      </div>
+
                       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs bg-white p-3 rounded-lg border border-slate-200">
                         <div>
                           <span className="text-slate-400 text-[10px] uppercase font-bold block">Phone</span>
@@ -280,7 +408,7 @@ export const LeasesDirectoryPage: React.FC = () => {
                           <span className="text-slate-800 font-medium">{lease.grant_date} → {lease.expiry_date}</span>
                         </div>
                         <div>
-                          <span className="text-slate-400 text-[10px] uppercase font-bold block">Annual Royalty</span>
+                          <span className="text-slate-400 text-[10px] uppercase font-bold block">Annual Rent / Royalty</span>
                           <span className="text-slate-800 font-bold font-mono">PKR {(lease.annual_rent_pkr || 2500000).toLocaleString()}</span>
                         </div>
                       </div>
@@ -293,7 +421,7 @@ export const LeasesDirectoryPage: React.FC = () => {
 
                         {linkedHearings.length === 0 ? (
                           <p className="text-xs text-slate-500 italic bg-white p-3 rounded border border-slate-200">
-                            No show-cause notices or personal hearings recorded against this lease.
+                            No show-cause notices or personal hearings recorded against this concession.
                           </p>
                         ) : (
                           <div className="space-y-1.5">
@@ -338,6 +466,41 @@ export const LeasesDirectoryPage: React.FC = () => {
               );
             })
           )}
+        </div>
+
+        {/* Pagination Bar */}
+        <div className="p-3.5 border-t border-slate-200 bg-slate-50 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-600">
+          <div>
+            Showing <span className="font-bold text-slate-900">
+              {filteredLeases.length === 0 ? 0 : (currentPage - 1) * pageSize + 1}
+            </span> to <span className="font-bold text-slate-900">
+              {Math.min(currentPage * pageSize, filteredLeases.length)}
+            </span> of <span className="font-bold text-slate-900">{filteredLeases.length}</span> concessions
+          </div>
+
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setCurrentPage(p => Math.max(p - 1, 1))}
+              disabled={currentPage === 1}
+              className="px-2.5 py-1 bg-white border border-slate-300 rounded text-xs font-medium text-slate-700 hover:bg-slate-100 disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-1"
+            >
+              <ChevronLeft className="w-3.5 h-3.5" />
+              <span>Previous</span>
+            </button>
+
+            <span className="font-semibold text-slate-800">
+              Page {currentPage} of {totalPages}
+            </span>
+
+            <button
+              onClick={() => setCurrentPage(p => Math.min(p + 1, totalPages))}
+              disabled={currentPage === totalPages}
+              className="px-2.5 py-1 bg-white border border-slate-300 rounded text-xs font-medium text-slate-700 hover:bg-slate-100 disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-1"
+            >
+              <span>Next</span>
+              <ChevronRight className="w-3.5 h-3.5" />
+            </button>
+          </div>
         </div>
 
       </div>

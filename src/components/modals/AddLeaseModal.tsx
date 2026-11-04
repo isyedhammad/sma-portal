@@ -7,6 +7,7 @@ import { X, Plus, Layers } from 'lucide-react';
 export const AddLeaseModal: React.FC = () => {
   const { activeAddLeaseModal, setActiveAddLeaseModal, addLease } = usePortal();
 
+  const [miningType, setMiningType] = useState<'ML' | 'PL'>('ML');
   const [leaseId, setLeaseId] = useState('');
   const [leaseTitle, setLeaseTitle] = useState('');
   const [mineralName, setMineralName] = useState('Limestone');
@@ -28,6 +29,7 @@ export const AddLeaseModal: React.FC = () => {
 
     addLease({
       lease_id: leaseId.trim() || undefined,
+      mining_type: miningType,
       lease_title: leaseTitle.trim(),
       mineral_name: mineralName.trim(),
       lessee_name: lesseeName.trim(),
@@ -73,6 +75,54 @@ export const AddLeaseModal: React.FC = () => {
         {/* Form */}
         <form onSubmit={handleSubmit} className="p-6 space-y-4 max-h-[75vh] overflow-y-auto text-xs sm:text-sm">
           
+          {/* Concession Classification: ML vs PL */}
+          <div>
+            <label className="block text-xs font-bold text-slate-700 mb-1.5 uppercase">
+              Concession Classification (ML vs PL) *
+            </label>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <label className={`p-3 rounded-lg border cursor-pointer flex flex-col justify-between transition-all ${
+                miningType === 'ML' ? 'bg-emerald-50 border-emerald-500 ring-2 ring-emerald-500/30' : 'bg-slate-50 border-slate-300'
+              }`}>
+                <div className="flex items-center justify-between">
+                  <span className="font-bold text-slate-900 text-xs flex items-center gap-1.5">
+                    <span className="w-2 h-2 rounded-full bg-emerald-600"></span>
+                    Mining Lease (ML)
+                  </span>
+                  <input
+                    type="radio"
+                    name="miningType"
+                    value="ML"
+                    checked={miningType === 'ML'}
+                    onChange={() => setMiningType('ML')}
+                    className="text-emerald-600"
+                  />
+                </div>
+                <span className="text-[10px] text-slate-500 mt-1">Rule 29 (PMR 2002) — Commercial extraction rights</span>
+              </label>
+
+              <label className={`p-3 rounded-lg border cursor-pointer flex flex-col justify-between transition-all ${
+                miningType === 'PL' ? 'bg-sky-50 border-sky-500 ring-2 ring-sky-500/30' : 'bg-slate-50 border-slate-300'
+              }`}>
+                <div className="flex items-center justify-between">
+                  <span className="font-bold text-slate-900 text-xs flex items-center gap-1.5">
+                    <span className="w-2 h-2 rounded-full bg-sky-600"></span>
+                    Prospecting License (PL)
+                  </span>
+                  <input
+                    type="radio"
+                    name="miningType"
+                    value="PL"
+                    checked={miningType === 'PL'}
+                    onChange={() => setMiningType('PL')}
+                    className="text-sky-600"
+                  />
+                </div>
+                <span className="text-[10px] text-slate-500 mt-1">Rule 14 (PMR 2002) — Exploration &amp; sampling rights</span>
+              </label>
+            </div>
+          </div>
+
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className="block text-xs font-semibold text-slate-700 mb-1">
