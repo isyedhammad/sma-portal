@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { usePortal } from '../context/PortalContext';
 import { PersonalHearing } from '../types';
-import { MINING_GALLERY, MiningPhoto } from '../data/miningGallery';
 import { 
   Clock, 
   CheckCircle2, 
@@ -14,12 +13,7 @@ import {
   FileText, 
   Printer, 
   AlertCircle,
-  X,
-  Compass,
-  Maximize2,
-  Sparkles,
-  Mountain,
-  Gem
+  X
 } from 'lucide-react';
 
 export const DashboardPage: React.FC = () => {
@@ -38,9 +32,6 @@ export const DashboardPage: React.FC = () => {
   const [pipelineView, setPipelineView] = useState<'table' | 'timeline'>('table');
   const [searchQuery, setSearchQuery] = useState('');
   const [districtFilter, setDistrictFilter] = useState('all');
-
-  // Photo Lightbox modal state
-  const [selectedPhoto, setSelectedPhoto] = useState<MiningPhoto | null>(null);
 
   // Adjournment modal
   const [adjournTargetHearing, setAdjournTargetHearing] = useState<PersonalHearing | null>(null);
@@ -84,24 +75,13 @@ export const DashboardPage: React.FC = () => {
   return (
     <div className="space-y-6 max-w-7xl mx-auto px-4 sm:px-6 pt-6">
       
-      {/* UNIQUE EXECUTIVE HERO SECTION WITH HD QUARRY & PINK SALT BACKDROP */}
-      <div className="relative rounded-2xl overflow-hidden shadow-md border border-slate-200 bg-slate-900 text-white">
-        {/* HD Background Imagery with Overlay */}
-        <div 
-          className="absolute inset-0 bg-cover bg-center opacity-30 mix-blend-luminosity scale-105"
-          style={{ 
-            backgroundImage: `url('assets/mining/mining_photo_8.jpg'), url('https://images.unsplash.com/photo-1578328819058-b69f3a3b0f6b?auto=format&fit=crop&w=1600&q=80')` 
-          }}
-        ></div>
-        
-        {/* Subtle Dark Gradient Overlay */}
-        <div className="absolute inset-0 bg-gradient-to-r from-slate-950 via-slate-900/90 to-emerald-950/70"></div>
-
-        <div className="relative z-10 p-6 sm:p-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+      {/* EXECUTIVE HERO BANNER */}
+      <div className="relative rounded-2xl overflow-hidden shadow-xs border border-slate-200 bg-gradient-to-r from-slate-900 via-slate-800 to-emerald-950 text-white">
+        <div className="p-6 sm:p-7 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
           <div className="space-y-2 max-w-2xl">
             <div className="flex items-center gap-2">
               <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
-              <span className="text-[11px] font-bold uppercase tracking-wider text-emerald-400 bg-emerald-950/80 px-2.5 py-0.5 rounded border border-emerald-500/30">
+              <span className="text-[11px] font-bold uppercase tracking-wider text-emerald-300 bg-emerald-950/80 px-2.5 py-0.5 rounded border border-emerald-500/30">
                 Licensing Authority • DGM&amp;M Punjab
               </span>
               <span className="text-xs text-slate-300 hidden sm:inline">
@@ -114,21 +94,21 @@ export const DashboardPage: React.FC = () => {
             </h1>
 
             <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
-              Monitoring <strong>{leases.length} registered Small Scale Mining concessions</strong> across 10 Punjab mining districts — from the subterranean pink salt formations of Khewra &amp; Warcha to the limestone quarries of the Salt Range &amp; Margalla hills.
+              Executive docket for monitoring <strong>{leases.length} Small Scale Mining concessions</strong> across Punjab mining districts — tracking statutory personal hearing notices, compliance hearings, and final written orders.
             </p>
 
             <div className="flex flex-wrap items-center gap-4 pt-2 text-xs text-slate-300">
               <div className="flex items-center gap-1.5">
                 <Layers className="w-4 h-4 text-emerald-400" />
-                <span><strong>1,836</strong> Total Leases</span>
+                <span><strong>{leases.length}</strong> Registered Leases</span>
               </div>
               <div className="flex items-center gap-1.5">
                 <Clock className="w-4 h-4 text-sky-400" />
                 <span><strong>{stats.upcomingHearingsCount}</strong> Scheduled Hearings</span>
               </div>
               <div className="flex items-center gap-1.5">
-                <Gem className="w-4 h-4 text-rose-400" />
-                <span>Pink Salt, Limestone &amp; Coal Hubs</span>
+                <Gavel className="w-4 h-4 text-amber-400" />
+                <span><strong>{stats.pendingOrdersCount}</strong> Pending Orders</span>
               </div>
             </div>
           </div>
@@ -150,67 +130,6 @@ export const DashboardPage: React.FC = () => {
               <span>Schedule Hearing</span>
             </button>
           </div>
-        </div>
-      </div>
-
-      {/* FEATURED HD MINING QUARRY & PINK SALT CARDS */}
-      <div>
-        <div className="flex items-center justify-between mb-3">
-          <div className="flex items-center gap-2">
-            <Mountain className="w-4 h-4 text-[#0A6238]" />
-            <h3 className="text-sm font-bold text-slate-900 uppercase tracking-wide">
-              Punjab Mineral Formations &amp; Quarry Field Operations
-            </h3>
-          </div>
-          <span className="text-xs text-slate-500 hidden sm:inline">
-            Click any quarry photo to inspect geological &amp; regulatory profile
-          </span>
-        </div>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          {MINING_GALLERY.map((photo) => (
-            <div
-              key={photo.id}
-              onClick={() => setSelectedPhoto(photo)}
-              className="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-xs hover:shadow-md transition-all cursor-pointer group flex flex-col justify-between"
-            >
-              {/* Photo Frame with Fallback Handling */}
-              <div className="relative h-36 bg-slate-100 overflow-hidden">
-                <img
-                  src={photo.image_url}
-                  alt={photo.title}
-                  onError={(e) => {
-                    // Graceful fallback to HD Unsplash URL
-                    (e.target as HTMLImageElement).src = photo.fallback_url;
-                  }}
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent"></div>
-                
-                <span className="absolute bottom-2 left-2.5 text-[10px] font-bold text-white bg-black/60 backdrop-blur-xs px-2 py-0.5 rounded">
-                  {photo.category}
-                </span>
-
-                <div className="absolute top-2 right-2 w-6 h-6 rounded-full bg-black/40 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                  <Maximize2 className="w-3 h-3" />
-                </div>
-              </div>
-
-              {/* Card Meta */}
-              <div className="p-3.5 space-y-1">
-                <h4 className="text-xs font-bold text-slate-900 line-clamp-1 group-hover:text-emerald-800 transition-colors">
-                  {photo.title}
-                </h4>
-                <p className="text-[11px] text-slate-500 line-clamp-1">
-                  {photo.district}
-                </p>
-                <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-[11px]">
-                  <span className="text-emerald-700 font-semibold text-[10px]">{photo.stats}</span>
-                  <span className="text-slate-400 group-hover:text-slate-600 text-[10px]">View Detail →</span>
-                </div>
-              </div>
-            </div>
-          ))}
         </div>
       </div>
 
@@ -639,54 +558,6 @@ export const DashboardPage: React.FC = () => {
         )}
 
       </div>
-
-      {/* HD PHOTO LIGHTBOX MODAL */}
-      {selectedPhoto && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm no-print">
-          <div className="bg-white rounded-2xl w-full max-w-2xl overflow-hidden shadow-2xl border border-slate-300 animate-in zoom-in-95 duration-200">
-            <div className="relative h-72 sm:h-80 bg-slate-900">
-              <img
-                src={selectedPhoto.image_url}
-                alt={selectedPhoto.title}
-                onError={(e) => {
-                  (e.target as HTMLImageElement).src = selectedPhoto.fallback_url;
-                }}
-                className="w-full h-full object-cover"
-              />
-              <button
-                onClick={() => setSelectedPhoto(null)}
-                className="absolute top-3 right-3 w-8 h-8 rounded-full bg-black/60 hover:bg-black text-white flex items-center justify-center"
-              >
-                <X className="w-4 h-4" />
-              </button>
-              <div className="absolute bottom-3 left-3 bg-black/70 backdrop-blur-xs text-white px-3 py-1 rounded-lg text-xs font-bold">
-                {selectedPhoto.category} • {selectedPhoto.district}
-              </div>
-            </div>
-
-            <div className="p-5 space-y-3">
-              <div>
-                <h3 className="text-base font-bold text-slate-900">{selectedPhoto.title}</h3>
-                <p className="text-xs text-emerald-800 font-semibold">{selectedPhoto.stats}</p>
-              </div>
-
-              <p className="text-xs text-slate-600 leading-relaxed">
-                {selectedPhoto.description}
-              </p>
-
-              <div className="pt-3 border-t border-slate-100 flex items-center justify-between text-xs">
-                <span className="text-slate-500">Punjab Mining Cadastre Official Photographic Archive</span>
-                <button
-                  onClick={() => setSelectedPhoto(null)}
-                  className="px-3 py-1 bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold rounded-lg"
-                >
-                  Close Photo
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* Adjourn Dialog */}
       {adjournTargetHearing && (
