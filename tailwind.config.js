@@ -7,17 +7,17 @@ export default {
   theme: {
     extend: {
       colors: {
-        gov: {
-          navy: '#0b192c',
-          navyLight: '#1e3e62',
-          gold: '#c99a3e',
-          goldLight: '#dfb76c',
-          emerald: '#0e704a',
-          emeraldLight: '#15803d',
+        punjab: {
+          green: '#0A6238',
+          greenLight: '#10B981',
+          gold: '#D97706',
+          sidebar: '#090E17',
+          sidebarHeader: '#05080E',
+          canvas: '#F8FAFC',
         }
       },
       fontFamily: {
-        sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
+        sans: ['"Plus Jakarta Sans"', 'Inter', 'system-ui', '-apple-system', 'sans-serif'],
         serif: ['Merriweather', 'Georgia', 'serif'],
       }
     },

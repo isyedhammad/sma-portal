@@ -1,6 +1,6 @@
 import React from 'react';
 import { usePortal } from '../../context/PortalContext';
-import { X, Printer, Download, ShieldCheck, QrCode } from 'lucide-react';
+import { X, Printer, QrCode } from 'lucide-react';
 
 export const NoticeDocketModal: React.FC = () => {
   const { activeNoticeDocket, setActiveNoticeDocket, leases } = usePortal();
@@ -15,29 +15,29 @@ export const NoticeDocketModal: React.FC = () => {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-slate-950/85 backdrop-blur-md overflow-y-auto">
-      <div className="bg-white text-slate-900 rounded-2xl w-full max-w-3xl shadow-2xl overflow-hidden my-auto border border-slate-300">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-black/60 backdrop-blur-xs overflow-y-auto">
+      <div className="bg-white text-slate-900 rounded-xl w-full max-w-3xl shadow-2xl overflow-hidden my-auto border border-slate-300">
         
         {/* Action Toolbar (Hidden during Print) */}
-        <div className="no-print bg-slate-900 border-b border-slate-800 px-6 py-3 flex items-center justify-between text-slate-100">
+        <div className="no-print bg-slate-900 px-6 py-3 flex items-center justify-between text-white">
           <div className="flex items-center gap-2">
-            <span className="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
-            <span className="text-xs font-semibold uppercase tracking-wider text-slate-300">
-              Statutory Summons Docket | Form SMA-H1
+            <span className="w-2 h-2 rounded-full bg-emerald-400"></span>
+            <span className="text-xs font-bold tracking-wide">
+              Official Personal Hearing Notice • {activeNoticeDocket.notice_reference_no}
             </span>
           </div>
 
           <div className="flex items-center gap-2">
             <button
               onClick={handlePrint}
-              className="flex items-center gap-1.5 bg-emerald-600 hover:bg-emerald-500 text-white px-3.5 py-1.5 rounded-lg text-xs font-bold shadow transition-all active:scale-95"
+              className="flex items-center gap-1.5 bg-[#0A6238] hover:bg-[#084e2c] text-white px-3.5 py-1.5 rounded-lg text-xs font-bold shadow-sm transition-all"
             >
-              <Printer className="w-4 h-4" />
-              <span>Print Official Notice</span>
+              <Printer className="w-3.5 h-3.5" />
+              <span>Print Notice</span>
             </button>
             <button
               onClick={() => setActiveNoticeDocket(null)}
-              className="text-slate-400 hover:text-slate-100 p-1.5 rounded-lg hover:bg-slate-800 transition-colors"
+              className="text-slate-400 hover:text-white p-1 rounded-lg"
             >
               <X className="w-5 h-5" />
             </button>
@@ -47,17 +47,24 @@ export const NoticeDocketModal: React.FC = () => {
         {/* Printable Official Legal Notice Document */}
         <div className="printable-document p-8 sm:p-12 text-slate-900 font-serif leading-relaxed">
           
-          {/* Government Letterhead Header */}
-          <div className="text-center border-b-2 border-slate-900 pb-5 mb-6">
+          {/* Government Letterhead Header with Real Punjab and DGMM Logos */}
+          <div className="text-center border-b-2 border-slate-900 pb-4 mb-6">
             <div className="flex items-center justify-center gap-3 mb-2">
-              <div className="w-12 h-12 rounded-full border-2 border-slate-900 flex items-center justify-center font-bold text-slate-900 text-xs">
-                GOVT
-              </div>
+              <img 
+                src="assets/punjab_logo.png" 
+                alt="Government of the Punjab" 
+                className="w-12 h-12 object-contain" 
+              />
+              <img 
+                src="assets/dgmm_logo.png" 
+                alt="Directorate General of Mines & Minerals" 
+                className="w-12 h-12 object-contain" 
+              />
             </div>
-            <h2 className="text-base sm:text-lg font-extrabold uppercase tracking-widest text-slate-900 font-sans">
-              Directorate General of Mines & Minerals
+            <h2 className="text-base sm:text-lg font-bold uppercase tracking-wider text-slate-900 font-sans">
+              Directorate General of Mines &amp; Minerals
             </h2>
-            <h3 className="text-xs sm:text-sm font-bold uppercase tracking-wider text-slate-800 font-sans">
+            <h3 className="text-xs sm:text-sm font-bold uppercase tracking-wide text-slate-800 font-sans">
               Government of the Punjab
             </h3>
             <p className="text-[11px] font-sans text-slate-600 mt-1">
@@ -66,47 +73,46 @@ export const NoticeDocketModal: React.FC = () => {
           </div>
 
           {/* Reference & Dispatch Meta */}
-          <div className="flex justify-between items-start text-xs font-sans mb-6">
+          <div className="flex justify-between items-start text-xs font-sans mb-5">
             <div>
-              <p><strong className="text-slate-900">Dispatch Ref No:</strong> <span className="font-mono font-bold text-slate-950">{activeNoticeDocket.notice_reference_no}</span></p>
-              <p className="mt-1"><strong className="text-slate-900">Case Identifier:</strong> <span className="font-mono text-slate-800">{activeNoticeDocket.hearing_id}</span></p>
+              <p><strong className="text-slate-900">Dispatch Ref:</strong> <span className="font-mono font-bold">{activeNoticeDocket.notice_reference_no}</span></p>
+              <p className="mt-0.5"><strong className="text-slate-900">Case ID:</strong> <span className="font-mono text-slate-700">{activeNoticeDocket.hearing_id}</span></p>
             </div>
             <div className="text-right">
-              <p><strong className="text-slate-900">Issue Date:</strong> {activeNoticeDocket.notice_issue_date}</p>
-              <p className="text-emerald-700 font-bold uppercase text-[10px] mt-1 tracking-wider">BY SPECIAL MESSENGER / URGENT</p>
+              <p><strong className="text-slate-900">Date:</strong> {activeNoticeDocket.notice_issue_date}</p>
+              <p className="text-emerald-800 font-bold uppercase text-[10px] mt-0.5">REGISTERED / URGENT</p>
             </div>
           </div>
 
           {/* Addressee */}
-          <div className="bg-slate-50 border border-slate-200 rounded-lg p-3 text-xs font-sans mb-6">
-            <p className="font-bold text-slate-900 uppercase tracking-wide">To,</p>
-            <p className="font-bold text-slate-950 text-sm mt-0.5">{associatedLease?.lessee_name || 'The Lessee / Authorized Representative'}</p>
-            <p className="text-slate-700 mt-0.5">Attn: {associatedLease?.proprietor_representative || 'Proprietor / Managing Partner'}</p>
-            <p className="text-slate-600">Contact: {associatedLease?.contact_number || 'N/A'}</p>
-            <p className="text-slate-600">Re: Small Mines Agreement ID: <strong className="text-slate-900 font-mono">{activeNoticeDocket.lease_id}</strong> ({associatedLease?.lease_title})</p>
-            <p className="text-slate-600">District: {associatedLease?.district}, Punjab</p>
+          <div className="bg-slate-50 border border-slate-200 rounded-lg p-3 text-xs font-sans mb-5">
+            <p className="font-bold text-slate-800 uppercase text-[11px]">To,</p>
+            <p className="font-bold text-slate-900 text-sm mt-0.5">{associatedLease?.lessee_name || 'The Lessee'}</p>
+            <p className="text-slate-700">Attn: {associatedLease?.proprietor_representative || 'Proprietor / Representative'}</p>
+            <p className="text-slate-600">Re: Lease ID <strong className="text-slate-900 font-mono">{activeNoticeDocket.lease_id}</strong> ({associatedLease?.lease_title})</p>
+            <p className="text-slate-600">District {associatedLease?.district}, Punjab</p>
           </div>
 
           {/* Subject Line */}
-          <div className="mb-6 text-center">
-            <h4 className="text-xs sm:text-sm font-bold uppercase text-slate-950 border-b border-slate-400 inline-block pb-1">
-              SUBJECT: STATUTORY NOTICE FOR PERSONAL HEARING BEFORE THE DIRECTOR SMA/T (LICENSING AUTHORITY)
+          <div className="mb-5 text-center">
+            <h4 className="text-xs sm:text-sm font-bold uppercase text-slate-950 border-b border-slate-400 inline-block pb-1 font-sans">
+              SUBJECT: NOTICE FOR STATUTORY PERSONAL HEARING BEFORE DIRECTOR SMA/T (LICENSING AUTHORITY)
             </h4>
           </div>
 
           {/* Body Narrative */}
-          <div className="space-y-4 text-xs sm:text-sm text-justify">
+          <div className="space-y-3.5 text-xs sm:text-sm text-justify">
             <p>
-              WHEREAS, you hold a statutory Small Mines Agreement (SMA) lease titled <strong className="font-bold">"{associatedLease?.lease_title}"</strong> for the extraction of <strong className="font-bold">{associatedLease?.mineral_name}</strong> in District <strong className="font-bold">{associatedLease?.district}</strong>, governed under the Punjab Mining Concession Rules 2002.
+              WHEREAS, you hold a Small Mines Agreement (SMA) lease titled <strong className="font-bold">"{associatedLease?.lease_title}"</strong> for the extraction of <strong className="font-bold">{associatedLease?.mineral_name}</strong> in District <strong className="font-bold">{associatedLease?.district}</strong>, governed under the Punjab Mining Concession Rules 2002.
             </p>
 
             <p>
-              AND WHEREAS, an official report submitted by the field inspecting staff and technical wing of this Directorate reveals that you have committed serious statutory non-compliance regarding:
+              AND WHEREAS, official field reports and departmental scrutiny reveal statutory non-compliance regarding:
             </p>
 
-            <div className="p-3 bg-amber-50/70 border-l-4 border-amber-600 rounded-r-lg font-sans my-3">
+            <div className="p-3 bg-amber-50 border-l-4 border-amber-600 rounded-r-lg font-sans my-2.5">
               <p className="font-bold text-slate-900 text-xs sm:text-sm">
-                PRIMARY STATUTORY GROUNDS: {activeNoticeDocket.hearing_purpose}
+                GROUNDS: {activeNoticeDocket.hearing_purpose}
               </p>
               {activeNoticeDocket.specific_allegations && (
                 <p className="text-xs text-slate-800 mt-1 italic">
@@ -116,78 +122,57 @@ export const NoticeDocketModal: React.FC = () => {
             </div>
 
             <p>
-              NOW THEREFORE, in accordance with the mandatory statutory provisions of Rule 48 & Rule 52 of the Punjab Mining Concession Rules 2002, you are hereby summoned to appear for a <strong className="font-bold">STATUTORY PERSONAL HEARING</strong> before the undersigned as per the following schedule:
+              NOW THEREFORE, under Rule 48 &amp; 52 of Punjab Mining Concession Rules 2002, you are hereby called upon to appear for a <strong className="font-bold">PERSONAL HEARING</strong> before the undersigned as scheduled below:
             </p>
 
             {/* Scheduled Venue Box */}
-            <div className="border border-slate-300 bg-slate-50/60 rounded-xl p-4 my-4 font-sans text-xs sm:text-sm">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div className="border border-slate-300 bg-slate-50 rounded-lg p-3.5 my-3 font-sans text-xs sm:text-sm">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                 <div>
-                  <span className="text-slate-500 uppercase text-[10px] font-bold block">Hearing Date & Day</span>
-                  <span className="font-bold text-slate-950 text-sm">
+                  <span className="text-slate-500 uppercase text-[10px] font-bold block">Hearing Date</span>
+                  <span className="font-bold text-slate-900 text-sm">
                     {hearingDateObj.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
                   </span>
                 </div>
                 <div>
-                  <span className="text-slate-500 uppercase text-[10px] font-bold block">Fixed Time Slot</span>
-                  <span className="font-bold text-slate-950 text-sm">
+                  <span className="text-slate-500 uppercase text-[10px] font-bold block">Time</span>
+                  <span className="font-bold text-slate-900 text-sm">
                     {hearingDateObj.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}
                   </span>
                 </div>
                 <div className="sm:col-span-2 mt-1">
-                  <span className="text-slate-500 uppercase text-[10px] font-bold block">Chamber / Courtroom Venue</span>
-                  <span className="font-semibold text-slate-900">
-                    {activeNoticeDocket.hearing_venue || "Judicial Chamber of Director SMA/T, Poonch House, Multan Road, Lahore"}
+                  <span className="text-slate-500 uppercase text-[10px] font-bold block">Venue / Office</span>
+                  <span className="font-medium text-slate-800">
+                    {activeNoticeDocket.hearing_venue || "Office of Director SMA/T, Directorate General of Mines & Minerals, Poonch House, Multan Road, Lahore"}
                   </span>
                 </div>
               </div>
             </div>
 
             <p>
-              You are directed to appear in person or through an authorized representative/counsel along with all relevant documentary evidence, including:
+              Please bring all relevant documentary record including lease deed, original bank payment challans, daily extraction registers, and monthly production returns.
             </p>
-            <ul className="list-disc pl-5 space-y-1 font-sans text-xs">
-              <li>Original copy of Small Mines Agreement lease deed and approved mine layout map.</li>
-              <li>Verified treasury payment challans of royalty, surface rent, and cesses up to date.</li>
-              <li>Daily mineral extraction logs, weighbridge calibration certificates, and Form-C returns.</li>
-              <li>Formal written response/rebuttal to the allegations stated herein.</li>
-            </ul>
 
-            <p className="font-semibold text-rose-950 bg-rose-50 p-2.5 rounded border border-rose-200 text-xs font-sans">
-              NOTE: In the event of failure to appear on the scheduled date and time, it shall be presumed that you have no defence to offer, and EX-PARTE quasi-judicial determination, including cancellation/revocation of the lease and forfeiture of security deposit under Rule 52, shall be rendered.
+            <p className="text-rose-900 bg-rose-50 p-2.5 rounded border border-rose-200 text-xs font-sans">
+              <strong>Notice:</strong> In case of non-appearance, proceedings shall be conducted ex-parte and determination rendered on available record under Rule 52.
             </p>
           </div>
 
-          {/* Signature & Seal Block */}
-          <div className="mt-12 pt-6 flex justify-between items-end">
-            <div className="text-left font-sans text-[11px] text-slate-600">
-              <div className="w-16 h-16 border border-slate-400 rounded-lg flex flex-col items-center justify-center p-1 bg-slate-50">
-                <QrCode className="w-10 h-10 text-slate-700" />
-                <span className="text-[8px] font-mono">DGM-VERIFY</span>
-              </div>
-              <p className="mt-1">QR Authenticated Docket</p>
+          {/* Signature Block */}
+          <div className="mt-10 pt-5 flex justify-between items-end">
+            <div className="text-left font-sans text-[11px] text-slate-500">
+              <QrCode className="w-8 h-8 text-slate-700 mb-1" />
+              <p>Official Verification Docket</p>
             </div>
 
             <div className="text-center font-sans">
               <div className="h-10"></div>
-              <p className="font-bold text-slate-950 border-t border-slate-900 pt-1 text-xs sm:text-sm">
+              <p className="font-bold text-slate-900 border-t border-slate-900 pt-1 text-xs sm:text-sm">
                 (DIRECTOR SMA/T)
               </p>
-              <p className="text-xs text-slate-700">Licensing Authority / Quasi-Judicial Bench</p>
-              <p className="text-[11px] text-slate-600">Directorate General of Mines & Minerals, Punjab</p>
+              <p className="text-xs text-slate-700">Licensing Authority</p>
+              <p className="text-[11px] text-slate-500">Directorate General of Mines &amp; Minerals, Punjab</p>
             </div>
-          </div>
-
-          {/* Endorsement list */}
-          <div className="mt-8 pt-4 border-t border-slate-300 text-[10px] font-sans text-slate-600 leading-tight">
-            <p className="font-bold text-slate-800">Copy forwarded for information and necessary action to:</p>
-            <ol className="list-decimal pl-4 space-y-0.5 mt-1">
-              <li>The Secretary to Government of the Punjab, Mines & Minerals Department, Lahore.</li>
-              <li>The Director General, Mines & Minerals Punjab, Lahore.</li>
-              <li>The Deputy Commissioner / District Collector, District {associatedLease?.district}.</li>
-              <li>The District Mining Officer / Assistant Director Mines, District {associatedLease?.district} (with direction to attend along with original field file).</li>
-              <li>Office Record / Master Quasi-Judicial Register.</li>
-            </ol>
           </div>
 
         </div>

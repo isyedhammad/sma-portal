@@ -5,16 +5,12 @@ import {
   CalendarPlus, 
   Search, 
   Lock, 
-  Building2, 
   MapPin, 
   FileText, 
   CheckCircle2, 
   AlertTriangle, 
-  Scale, 
   Clock, 
-  Sparkles,
-  ArrowRight,
-  ShieldCheck
+  ArrowRight
 } from 'lucide-react';
 
 export const ScheduleHearingPage: React.FC = () => {
@@ -36,7 +32,6 @@ export const ScheduleHearingPage: React.FC = () => {
 
   // Hearing form fields
   const [hearingDate, setHearingDate] = useState<string>(() => {
-    // Default to tomorrow 10:30 AM
     const d = new Date();
     d.setDate(d.getDate() + 2);
     d.setHours(10, 30, 0, 0);
@@ -53,19 +48,16 @@ export const ScheduleHearingPage: React.FC = () => {
   const [hearingPurpose, setHearingPurpose] = useState<string>(STATUTORY_VIOLATION_GROUNDS[0]);
   const [specificAllegations, setSpecificAllegations] = useState<string>('');
   const [presidingOfficer, setPresidingOfficer] = useState<string>('Director SMA/T - Licensing Authority');
-  const [hearingVenue, setHearingVenue] = useState<string>('Judicial Chamber, DGM&M Punjab, Poonch House, Multan Road, Lahore');
+  const [hearingVenue, setHearingVenue] = useState<string>('Director Office, DGM&M Punjab, Poonch House, Multan Road, Lahore');
 
-  // Currently resolved lease object
   const selectedLease = leases.find(l => l.lease_id === selectedLeaseId) || null;
 
-  // When selectedLeaseForHearing changes from outside
   useEffect(() => {
     if (selectedLeaseForHearing) {
       setSelectedLeaseId(selectedLeaseForHearing.lease_id);
     }
   }, [selectedLeaseForHearing]);
 
-  // Update allegations template when purpose changes
   const handlePurposeChange = (purpose: string) => {
     setHearingPurpose(purpose);
     
@@ -111,7 +103,7 @@ export const ScheduleHearingPage: React.FC = () => {
       addToast({
         type: 'error',
         title: 'Validation Error',
-        message: 'Please select a registered SMA Lease from the directory.'
+        message: 'Please select a registered SMA Lease from the list.'
       });
       return;
     }
@@ -120,7 +112,7 @@ export const ScheduleHearingPage: React.FC = () => {
       addToast({
         type: 'error',
         title: 'Validation Error',
-        message: 'Please specify the statutory hearing date and time.'
+        message: 'Please choose the hearing date and time.'
       });
       return;
     }
@@ -136,84 +128,70 @@ export const ScheduleHearingPage: React.FC = () => {
       hearing_venue: hearingVenue.trim(),
     });
 
-    // Reset selection and open the official notice docket
     setSelectedLeaseForHearing(null);
     setActiveNoticeDocket(scheduled);
   };
 
   return (
-    <div className="max-w-5xl mx-auto px-4 sm:px-6 py-6 space-y-6">
+    <div className="max-w-4xl mx-auto px-4 sm:px-6 pt-6 space-y-6">
       
-      {/* Page Title & Context Header */}
-      <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl relative overflow-hidden">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <div>
-            <div className="flex items-center gap-2 mb-1.5">
-              <span className="w-2 h-2 rounded-full bg-emerald-400"></span>
-              <span className="text-xs font-bold uppercase tracking-wider text-emerald-400">
-                Statutory Show-Cause & Summons Section
-              </span>
-            </div>
-            <h2 className="text-xl sm:text-2xl font-bold text-slate-100 tracking-tight">
-              Schedule Personal Hearing & Issue Notice
-            </h2>
-            <p className="text-xs sm:text-sm text-slate-400 mt-1 max-w-2xl leading-relaxed">
-              Initiate statutory quasi-judicial hearing proceedings against SMA lessees under Rule 48 & 52 of Punjab Mining Concession Rules 2002. Selecting a lease automatically locks official title and licensee details.
-            </p>
-          </div>
-
-          <button
-            onClick={() => setActiveTab('dashboard')}
-            className="self-start md:self-auto text-xs text-slate-400 hover:text-slate-200 border border-slate-700 bg-slate-950 px-3 py-2 rounded-xl transition-colors"
-          >
-            ← Back to Dashboard
-          </button>
+      {/* Page Header */}
+      <div className="bg-white border border-slate-200 rounded-xl p-5 shadow-sm flex items-center justify-between">
+        <div>
+          <h2 className="text-lg sm:text-xl font-bold text-slate-900">
+            Schedule Personal Hearing &amp; Issue Notice
+          </h2>
+          <p className="text-xs text-slate-500 mt-0.5">
+            Select an SMA lease to auto-populate concession information and generate a formal notice
+          </p>
         </div>
+
+        <button
+          onClick={() => setActiveTab('dashboard')}
+          className="text-xs text-slate-600 hover:text-slate-900 border border-slate-300 bg-white px-3 py-1.5 rounded-lg transition-colors"
+        >
+          ← Back to Dashboard
+        </button>
       </div>
 
-      {/* Main Interactive Form Card */}
-      <div className="bg-slate-900 border border-slate-800 rounded-2xl shadow-xl overflow-hidden">
-        <form onSubmit={handleSubmit} className="p-6 sm:p-8 space-y-6">
+      {/* Main Form Card */}
+      <div className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
+        <form onSubmit={handleSubmit} className="p-6 space-y-6">
           
-          {/* SECTION 1: LEASE SELECTOR & AUTO-POPULATION */}
-          <div className="space-y-4">
-            <div className="flex items-center justify-between border-b border-slate-800 pb-2.5">
-              <h3 className="text-sm font-bold text-slate-200 uppercase tracking-wide flex items-center gap-2">
-                <span className="w-6 h-6 rounded-lg bg-emerald-950 border border-emerald-500/40 text-emerald-400 flex items-center justify-center text-xs">
-                  1
-                </span>
-                <span>Select Target Small Mines Agreement (SMA) Lease</span>
+          {/* STEP 1: LEASE SELECTION */}
+          <div className="space-y-3">
+            <div className="border-b border-slate-200 pb-2">
+              <h3 className="text-xs font-bold text-slate-800 uppercase tracking-wide">
+                1. Select Target SMA Lease
               </h3>
-              <span className="text-xs text-slate-400">Step 1 of 3</span>
             </div>
 
-            {/* Searchable Lease Typeahead Dropdown */}
+            {/* Typeahead Search Input */}
             <div className="relative">
-              <label className="block text-xs font-semibold text-slate-300 mb-1.5">
-                Search & Select Lease Agreement *
+              <label className="block text-xs font-semibold text-slate-700 mb-1">
+                Search Lease by Number, Company Name, Mineral or District *
               </label>
 
               <div className="relative">
-                <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
                 <input
                   type="text"
-                  placeholder="Type Lease ID (e.g. SMA-ATK-...), Company Name, District, or Mineral..."
+                  placeholder="e.g. SMA-ATK-..., M/s Indus Valley, Limestone..."
                   value={leaseSearchTerm}
                   onFocus={() => setIsLeaseDropdownOpen(true)}
                   onChange={(e) => {
                     setLeaseSearchTerm(e.target.value);
                     setIsLeaseDropdownOpen(true);
                   }}
-                  className="w-full bg-slate-950 border border-slate-700 rounded-xl pl-10 pr-4 py-2.5 text-xs sm:text-sm text-slate-100 focus:outline-none focus:border-emerald-500 shadow-inner"
+                  className="w-full bg-slate-50 border border-slate-300 rounded-lg pl-9 pr-3 py-2 text-xs sm:text-sm text-slate-800 focus:outline-none focus:border-emerald-600 focus:bg-white"
                 />
               </div>
 
-              {/* Dropdown Results */}
               {isLeaseDropdownOpen && (
-                <div className="absolute top-full left-0 right-0 mt-1.5 bg-slate-950 border border-slate-700 rounded-xl max-h-64 overflow-y-auto shadow-2xl z-30 divide-y divide-slate-800/80">
+                <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-slate-300 rounded-lg max-h-56 overflow-y-auto shadow-lg z-30 divide-y divide-slate-100">
                   {filteredLeases.length === 0 ? (
-                    <div className="p-4 text-center text-slate-400 text-xs">
-                      No matching SMA leases found in directory.
+                    <div className="p-3 text-center text-slate-500 text-xs">
+                      No matching SMA leases found.
                     </div>
                   ) : (
                     filteredLeases.map(lease => (
@@ -224,25 +202,21 @@ export const ScheduleHearingPage: React.FC = () => {
                           setLeaseSearchTerm(`${lease.lease_id} — ${lease.lessee_name} (${lease.mineral_name}, ${lease.district})`);
                           setIsLeaseDropdownOpen(false);
                         }}
-                        className={`p-3 hover:bg-slate-800/80 cursor-pointer transition-colors flex items-center justify-between gap-3 text-xs ${
-                          selectedLeaseId === lease.lease_id ? 'bg-emerald-950/40 text-emerald-300' : 'text-slate-200'
+                        className={`p-2.5 hover:bg-slate-50 cursor-pointer transition-colors flex items-center justify-between text-xs ${
+                          selectedLeaseId === lease.lease_id ? 'bg-emerald-50 text-emerald-900 font-semibold' : 'text-slate-800'
                         }`}
                       >
                         <div>
                           <div className="flex items-center gap-2">
-                            <span className="font-mono font-bold text-emerald-400">{lease.lease_id}</span>
-                            <span className="text-slate-400">•</span>
-                            <span className="font-semibold text-slate-100">{lease.lessee_name}</span>
+                            <span className="font-mono font-bold text-emerald-800">{lease.lease_id}</span>
+                            <span>•</span>
+                            <span className="font-medium">{lease.lessee_name}</span>
                           </div>
-                          <p className="text-[11px] text-slate-400 line-clamp-1 mt-0.5">
-                            {lease.lease_title} • Mineral: <strong className="text-slate-300">{lease.mineral_name}</strong> ({lease.district})
+                          <p className="text-[11px] text-slate-500">
+                            {lease.lease_title} ({lease.mineral_name}, {lease.district})
                           </p>
                         </div>
-                        <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full flex-shrink-0 ${
-                          lease.lease_status === 'Active' ? 'bg-emerald-950 text-emerald-300 border border-emerald-700' :
-                          lease.lease_status === 'Suspended' ? 'bg-rose-950 text-rose-300 border border-rose-700' :
-                          'bg-amber-950 text-amber-300 border border-amber-700'
-                        }`}>
+                        <span className="text-[10px] px-2 py-0.5 rounded-full bg-slate-100 font-semibold">
                           {lease.lease_status}
                         </span>
                       </div>
@@ -252,283 +226,179 @@ export const ScheduleHearingPage: React.FC = () => {
               )}
             </div>
 
-            {/* AUTO-POPULATING FIELDS (READ-ONLY LOCKED) */}
+            {/* AUTO-POPULATED LOCKED FIELDS */}
             {selectedLease ? (
-              <div className="bg-slate-950/80 border border-slate-700/80 rounded-xl p-4 sm:p-5 shadow-inner animate-in fade-in duration-200">
-                <div className="flex items-center justify-between mb-3 border-b border-slate-800 pb-2">
-                  <div className="flex items-center gap-2">
-                    <Lock className="w-3.5 h-3.5 text-amber-400" />
-                    <span className="text-xs font-bold text-slate-300 uppercase tracking-wider">
-                      Locked Verified Lease Dossier (Auto-Fetched from Records)
-                    </span>
+              <div className="bg-slate-50 border border-slate-200 rounded-lg p-4 space-y-3">
+                <div className="flex items-center justify-between border-b border-slate-200 pb-2">
+                  <div className="flex items-center gap-1.5 text-xs font-bold text-slate-700">
+                    <Lock className="w-3.5 h-3.5 text-amber-600" />
+                    <span>Auto-Populated Lease Information (Read-Only)</span>
                   </div>
-                  <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
-                    selectedLease.lease_status === 'Active' ? 'bg-emerald-950 text-emerald-300 border border-emerald-800' : 'bg-amber-950 text-amber-300 border border-amber-800'
-                  }`}>
+                  <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-white border border-slate-300">
                     Status: {selectedLease.lease_status}
                   </span>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 text-xs">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 text-xs">
                   <div>
-                    <label className="text-[10px] font-bold text-slate-500 uppercase block mb-1">
-                      Lease Reference ID
-                    </label>
-                    <input 
-                      type="text" 
-                      readOnly 
-                      value={selectedLease.lease_id} 
-                      className="w-full bg-slate-900 border border-slate-800 rounded-lg p-2 text-slate-200 font-mono font-bold cursor-not-allowed text-xs" 
-                    />
+                    <label className="text-[10px] font-bold text-slate-500 uppercase block mb-0.5">Lease ID</label>
+                    <input type="text" readOnly value={selectedLease.lease_id} className="w-full bg-white border border-slate-300 rounded p-1.5 text-slate-800 font-mono font-bold text-xs" />
                   </div>
-
                   <div>
-                    <label className="text-[10px] font-bold text-slate-500 uppercase block mb-1">
-                      Lease Title / Mineral
-                    </label>
-                    <input 
-                      type="text" 
-                      readOnly 
-                      value={`${selectedLease.mineral_name} — ${selectedLease.lease_title}`} 
-                      className="w-full bg-slate-900 border border-slate-800 rounded-lg p-2 text-slate-200 cursor-not-allowed text-xs" 
-                    />
+                    <label className="text-[10px] font-bold text-slate-500 uppercase block mb-0.5">Mineral &amp; Title</label>
+                    <input type="text" readOnly value={`${selectedLease.mineral_name} - ${selectedLease.lease_title}`} className="w-full bg-white border border-slate-300 rounded p-1.5 text-slate-800 text-xs truncate" />
                   </div>
-
                   <div>
-                    <label className="text-[10px] font-bold text-slate-500 uppercase block mb-1">
-                      Lessee / Company Name
-                    </label>
-                    <input 
-                      type="text" 
-                      readOnly 
-                      value={selectedLease.lessee_name} 
-                      className="w-full bg-slate-900 border border-slate-800 rounded-lg p-2 text-slate-200 font-semibold cursor-not-allowed text-xs" 
-                    />
+                    <label className="text-[10px] font-bold text-slate-500 uppercase block mb-0.5">Lessee / Company</label>
+                    <input type="text" readOnly value={selectedLease.lessee_name} className="w-full bg-white border border-slate-300 rounded p-1.5 text-slate-800 font-semibold text-xs truncate" />
                   </div>
-
                   <div>
-                    <label className="text-[10px] font-bold text-slate-500 uppercase block mb-1">
-                      District & Jurisdiction
-                    </label>
-                    <input 
-                      type="text" 
-                      readOnly 
-                      value={`${selectedLease.district}${selectedLease.tehsil ? ` (${selectedLease.tehsil})` : ''}, Punjab`} 
-                      className="w-full bg-slate-900 border border-slate-800 rounded-lg p-2 text-slate-200 cursor-not-allowed text-xs" 
-                    />
-                  </div>
-
-                  <div>
-                    <label className="text-[10px] font-bold text-slate-500 uppercase block mb-1">
-                      Representative / CEO
-                    </label>
-                    <input 
-                      type="text" 
-                      readOnly 
-                      value={selectedLease.proprietor_representative} 
-                      className="w-full bg-slate-900 border border-slate-800 rounded-lg p-2 text-slate-300 cursor-not-allowed text-xs" 
-                    />
-                  </div>
-
-                  <div>
-                    <label className="text-[10px] font-bold text-slate-500 uppercase block mb-1">
-                      Contact Phone
-                    </label>
-                    <input 
-                      type="text" 
-                      readOnly 
-                      value={selectedLease.contact_number} 
-                      className="w-full bg-slate-900 border border-slate-800 rounded-lg p-2 text-slate-300 cursor-not-allowed text-xs font-mono" 
-                    />
-                  </div>
-
-                  <div>
-                    <label className="text-[10px] font-bold text-slate-500 uppercase block mb-1">
-                      Sanctioned Acreage
-                    </label>
-                    <input 
-                      type="text" 
-                      readOnly 
-                      value={`${selectedLease.area_acreage} Acres`} 
-                      className="w-full bg-slate-900 border border-slate-800 rounded-lg p-2 text-slate-300 cursor-not-allowed text-xs" 
-                    />
-                  </div>
-
-                  <div>
-                    <label className="text-[10px] font-bold text-slate-500 uppercase block mb-1">
-                      GPS Coordinates
-                    </label>
-                    <input 
-                      type="text" 
-                      readOnly 
-                      value={selectedLease.coordinates || 'DEMARCATED GRID PILLARS'} 
-                      className="w-full bg-slate-900 border border-slate-800 rounded-lg p-2 text-slate-400 cursor-not-allowed text-xs font-mono" 
-                    />
+                    <label className="text-[10px] font-bold text-slate-500 uppercase block mb-0.5">District / Location</label>
+                    <input type="text" readOnly value={`${selectedLease.district}, Punjab`} className="w-full bg-white border border-slate-300 rounded p-1.5 text-slate-800 text-xs" />
                   </div>
                 </div>
               </div>
             ) : (
-              <div className="bg-slate-950/40 border border-dashed border-slate-800 rounded-xl p-4 text-center text-xs text-slate-500">
-                Please select a lease above to automatically populate and lock official concession records.
+              <div className="bg-slate-50 border border-dashed border-slate-300 rounded-lg p-3 text-center text-xs text-slate-500">
+                Please select a lease above to lock concession records.
               </div>
             )}
           </div>
 
-          {/* SECTION 2: HEARING DATE & TIME */}
-          <div className="space-y-4 pt-2">
-            <div className="flex items-center justify-between border-b border-slate-800 pb-2.5">
-              <h3 className="text-sm font-bold text-slate-200 uppercase tracking-wide flex items-center gap-2">
-                <span className="w-6 h-6 rounded-lg bg-emerald-950 border border-emerald-500/40 text-emerald-400 flex items-center justify-center text-xs">
-                  2
-                </span>
-                <span>Statutory Hearing Schedule & Dispatch Reference</span>
+          {/* STEP 2: HEARING DATE & NOTICE REF */}
+          <div className="space-y-3 pt-2">
+            <div className="border-b border-slate-200 pb-2">
+              <h3 className="text-xs font-bold text-slate-800 uppercase tracking-wide">
+                2. Hearing Schedule &amp; Notice Details
               </h3>
-              <span className="text-xs text-slate-400">Step 2 of 3</span>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <div>
-                <label className="block text-xs font-semibold text-slate-300 mb-1.5 flex items-center gap-1.5">
-                  <Clock className="w-3.5 h-3.5 text-emerald-400" />
-                  Statutory Hearing Date & Time *
+                <label className="block text-xs font-semibold text-slate-700 mb-1">
+                  Hearing Date &amp; Time *
                 </label>
                 <input
                   type="datetime-local"
                   required
                   value={hearingDate}
                   onChange={(e) => setHearingDate(e.target.value)}
-                  className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-xs sm:text-sm text-slate-100 focus:outline-none focus:border-emerald-500 font-mono shadow-inner"
+                  className="w-full bg-slate-50 border border-slate-300 rounded-lg p-2 text-xs text-slate-800 focus:outline-none focus:border-emerald-600 focus:bg-white font-mono"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-slate-300 mb-1.5">
-                  Notice Dispatch Reference Number *
+                <label className="block text-xs font-semibold text-slate-700 mb-1">
+                  Notice Dispatch Number *
                 </label>
                 <input
                   type="text"
                   required
                   value={noticeRefNo}
                   onChange={(e) => setNoticeRefNo(e.target.value)}
-                  className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-xs sm:text-sm text-slate-100 focus:outline-none focus:border-emerald-500 font-mono"
-                  placeholder="e.g. DGM&M/SMA/H-108/2026"
+                  className="w-full bg-slate-50 border border-slate-300 rounded-lg p-2 text-xs text-slate-800 focus:outline-none focus:border-emerald-600 focus:bg-white font-mono"
                 />
-                <span className="text-[10px] text-slate-500 mt-1 block">Auto-generated statutory dispatch sequence (editable)</span>
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-slate-300 mb-1.5">
+                <label className="block text-xs font-semibold text-slate-700 mb-1">
                   Notice Issue Date
                 </label>
                 <input
                   type="date"
                   value={noticeDate}
                   onChange={(e) => setNoticeDate(e.target.value)}
-                  className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-xs sm:text-sm text-slate-100 focus:outline-none focus:border-emerald-500"
+                  className="w-full bg-slate-50 border border-slate-300 rounded-lg p-2 text-xs text-slate-800 focus:outline-none focus:border-emerald-600 focus:bg-white"
                 />
               </div>
             </div>
           </div>
 
-          {/* SECTION 3: STATUTORY GROUNDS & VENUE */}
-          <div className="space-y-4 pt-2">
-            <div className="flex items-center justify-between border-b border-slate-800 pb-2.5">
-              <h3 className="text-sm font-bold text-slate-200 uppercase tracking-wide flex items-center gap-2">
-                <span className="w-6 h-6 rounded-lg bg-emerald-950 border border-emerald-500/40 text-emerald-400 flex items-center justify-center text-xs">
-                  3
-                </span>
-                <span>Grounds for Hearing & Presiding Chamber</span>
+          {/* STEP 3: GROUNDS & ALLEGATIONS */}
+          <div className="space-y-3 pt-2">
+            <div className="border-b border-slate-200 pb-2">
+              <h3 className="text-xs font-bold text-slate-800 uppercase tracking-wide">
+                3. Grounds for Hearing &amp; Specific Allegations
               </h3>
-              <span className="text-xs text-slate-400">Step 3 of 3</span>
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-slate-300 mb-1.5 flex items-center justify-between">
-                <span>Statutory Violation Category / Grounds *</span>
-                <span className="text-[10px] text-emerald-400 font-semibold">Under PMR 2002</span>
+              <label className="block text-xs font-semibold text-slate-700 mb-1">
+                Violation Grounds *
               </label>
               <select
                 value={hearingPurpose}
                 onChange={(e) => handlePurposeChange(e.target.value)}
-                className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3.5 py-2.5 text-xs sm:text-sm text-slate-100 focus:outline-none focus:border-emerald-500 font-medium"
+                className="w-full bg-slate-50 border border-slate-300 rounded-lg p-2 text-xs text-slate-800 focus:outline-none focus:border-emerald-600 focus:bg-white font-medium"
               >
-                {STATUTORY_VIOLATION_GROUNDS.map(ground => (
-                  <option key={ground} value={ground}>{ground}</option>
+                {STATUTORY_VIOLATION_GROUNDS.map(g => (
+                  <option key={g} value={g}>{g}</option>
                 ))}
               </select>
             </div>
 
-            {/* Detailed statement of allegations */}
             <div>
-              <label className="block text-xs font-semibold text-slate-300 mb-1.5 flex items-center justify-between">
-                <span>Specific Statement of Allegations & Inspection Extract</span>
-                <span className="text-[10px] text-slate-500">Will be quoted verbatim on the Notice Docket</span>
+              <label className="block text-xs font-semibold text-slate-700 mb-1">
+                Specific Statement of Allegations
               </label>
               <textarea
-                rows={4}
+                rows={3}
                 value={specificAllegations}
                 onChange={(e) => setSpecificAllegations(e.target.value)}
-                placeholder="Enter specific facts, survey dates, or overdue challan amounts..."
-                className="w-full bg-slate-950 border border-slate-700 rounded-xl p-3 text-xs sm:text-sm text-slate-200 focus:outline-none focus:border-emerald-500 leading-relaxed font-serif"
+                className="w-full bg-slate-50 border border-slate-300 rounded-lg p-2.5 text-xs text-slate-800 focus:outline-none focus:border-emerald-600 focus:bg-white"
+                placeholder="Details of royalty default, encroachment measurement, or inspection findings..."
               />
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label className="block text-xs font-semibold text-slate-300 mb-1.5">
-                  Presiding Officer / Authority
+                <label className="block text-xs font-semibold text-slate-700 mb-1">
+                  Presiding Officer
                 </label>
                 <input
                   type="text"
                   value={presidingOfficer}
                   onChange={(e) => setPresidingOfficer(e.target.value)}
-                  className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-xs sm:text-sm text-slate-200 focus:outline-none focus:border-emerald-500"
+                  className="w-full bg-slate-50 border border-slate-300 rounded-lg p-2 text-xs text-slate-800 focus:outline-none focus:border-emerald-600 focus:bg-white"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-slate-300 mb-1.5">
-                  Hearing Venue / Chamber
+                <label className="block text-xs font-semibold text-slate-700 mb-1">
+                  Hearing Room / Location
                 </label>
                 <input
                   type="text"
                   value={hearingVenue}
                   onChange={(e) => setHearingVenue(e.target.value)}
-                  className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-xs sm:text-sm text-slate-200 focus:outline-none focus:border-emerald-500"
+                  className="w-full bg-slate-50 border border-slate-300 rounded-lg p-2 text-xs text-slate-800 focus:outline-none focus:border-emerald-600 focus:bg-white"
                 />
               </div>
             </div>
           </div>
 
-          {/* SUBMIT BUTTON BAR */}
-          <div className="pt-4 border-t border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-4">
-            <div className="text-xs text-slate-400 flex items-center gap-2">
-              <ShieldCheck className="w-4 h-4 text-emerald-400" />
-              <span>Validates required fields, commits to judicial calendar, and generates printable Docket</span>
-            </div>
+          {/* SUBMISSION BAR */}
+          <div className="pt-4 border-t border-slate-200 flex items-center justify-end gap-3">
+            <button
+              type="button"
+              onClick={() => {
+                setSelectedLeaseId('');
+                setLeaseSearchTerm('');
+                setSpecificAllegations('');
+              }}
+              className="px-4 py-2 text-xs font-semibold text-slate-600 hover:text-slate-900"
+            >
+              Reset
+            </button>
 
-            <div className="flex items-center gap-3 w-full sm:w-auto">
-              <button
-                type="button"
-                onClick={() => {
-                  setSelectedLeaseId('');
-                  setLeaseSearchTerm('');
-                  setSpecificAllegations('');
-                }}
-                className="px-4 py-2.5 rounded-xl text-xs font-medium text-slate-400 hover:text-slate-200 hover:bg-slate-800 transition-colors w-full sm:w-auto text-center"
-              >
-                Clear Form
-              </button>
-
-              <button
-                type="submit"
-                className="flex items-center justify-center gap-2 bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-500 hover:to-emerald-400 text-white font-bold px-6 py-2.5 rounded-xl text-xs sm:text-sm shadow-xl transition-all active:scale-95 border border-emerald-400/40 w-full sm:w-auto"
-              >
-                <CalendarPlus className="w-4 h-4" />
-                <span>Register Hearing & Generate Notice Docket</span>
-                <ArrowRight className="w-4 h-4" />
-              </button>
-            </div>
+            <button
+              type="submit"
+              className="flex items-center gap-2 bg-[#0A6238] hover:bg-[#084e2c] text-white font-bold px-5 py-2.5 rounded-lg text-xs shadow-sm transition-all"
+            >
+              <CalendarPlus className="w-4 h-4" />
+              <span>Register Hearing &amp; Generate Notice Docket</span>
+              <ArrowRight className="w-4 h-4" />
+            </button>
           </div>
 
         </form>

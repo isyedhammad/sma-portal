@@ -4,14 +4,8 @@ import { DecisionCategory, LeaseStatus, OrderDetails } from '../../types';
 import { 
   X, 
   Gavel, 
-  Calendar, 
-  FileText, 
-  AlertCircle, 
-  ShieldAlert, 
-  CheckCircle2, 
   DollarSign, 
-  Clock, 
-  Send
+  Clock
 } from 'lucide-react';
 
 export const IssueOrderModal: React.FC = () => {
@@ -32,15 +26,13 @@ export const IssueOrderModal: React.FC = () => {
   const [orderDate, setOrderDate] = useState('');
   const [decisionCategory, setDecisionCategory] = useState<DecisionCategory>('Penalty Imposed');
   const [penaltyAmount, setPenaltyAmount] = useState<number>(500000);
-  const [complianceDeadline, setComplianceDeadline] = useState('15 days from dispatch');
+  const [complianceDeadline, setComplianceDeadline] = useState('15 days from date of issue');
   const [decisionSummary, setDecisionSummary] = useState('');
   const [dispatched, setDispatched] = useState(true);
   const [leaseStatusUpdate, setLeaseStatusUpdate] = useState<LeaseStatus>('Show-Cause Issued');
   const [presidingOfficer, setPresidingOfficer] = useState('Director SMA/T - Licensing Authority');
   const [attendees, setAttendees] = useState('');
-  const [legalProvisions, setLegalProvisions] = useState('Rule 48 & 52 of Punjab Mining Concession Rules 2002');
 
-  // Initialize values when modal opens
   useEffect(() => {
     if (activeIssueOrderHearing) {
       const today = new Date().toISOString().split('T')[0];
@@ -49,8 +41,8 @@ export const IssueOrderModal: React.FC = () => {
       setOrderDate(activeIssueOrderHearing.order_details?.order_date || today);
       
       const defaultAttendees = associatedLease 
-        ? `${associatedLease.proprietor_representative} (Representative/CEO for ${associatedLease.lessee_name}), Assistant Director Legal (DGM&M)`
-        : 'Authorized Representative of Lessee, Legal Advisor DGM&M';
+        ? `${associatedLease.proprietor_representative} (Representative for ${associatedLease.lessee_name}), Assistant Director Legal`
+        : 'Representative of Lessee, Legal Officer';
       setAttendees(defaultAttendees);
 
       if (activeIssueOrderHearing.order_details) {
@@ -60,49 +52,46 @@ export const IssueOrderModal: React.FC = () => {
         setComplianceDeadline(activeIssueOrderHearing.order_details.compliance_deadline || '');
         setDispatched(activeIssueOrderHearing.order_details.dispatched);
       } else {
-        // Pre-fill a sensible operative summary based on hearing purpose
         setDecisionSummary(
-          `Having examined the record, inspection reports, and defence submissions, the Competent Authority (Director SMA/T) finds that the lessee failed to comply with statutory terms regarding "${activeIssueOrderHearing.hearing_purpose}". Accordingly, a financial penalty is imposed under Rule 48. The lessee is directed to deposit the sum in Government Treasury within the stipulated timeline.`
+          `Having examined the record, inspection report and submissions, the undersigned finds that the lessee failed to comply with terms regarding "${activeIssueOrderHearing.hearing_purpose}". Accordingly, penalty is imposed under Rule 48. The lessee is directed to deposit the sum in Government Treasury within 15 days.`
         );
       }
 
-      // Sync lease status suggestion
       if (associatedLease) {
         setLeaseStatusUpdate(associatedLease.lease_status);
       }
     }
   }, [activeIssueOrderHearing, associatedLease]);
 
-  // Adjust default summary and suggested status when decision category changes
   const handleCategoryChange = (category: DecisionCategory) => {
     setDecisionCategory(category);
     if (category === 'Penalty Imposed') {
       setPenaltyAmount(500000);
       setLeaseStatusUpdate('Show-Cause Issued');
       setDecisionSummary(
-        `Having examined the factual record and defence plea, a formal penalty of PKR 500,000 is imposed under Rule 48 of Punjab Mining Concession Rules 2002. Sum must be deposited via National Bank of Pakistan treasury challan within 15 days.`
+        `Having examined the record, a penalty of PKR 500,000 is imposed under Rule 48 of Punjab Mining Concession Rules 2002. Sum must be deposited via National Bank of Pakistan treasury challan within 15 days.`
       );
     } else if (category === 'Lease Revoked/Cancelled') {
       setPenaltyAmount(0);
       setLeaseStatusUpdate('Suspended');
       setDecisionSummary(
-        `Due to persistent and un-rectified statutory violations regarding ${activeIssueOrderHearing.hearing_purpose}, Small Mines Agreement Lease ${activeIssueOrderHearing.lease_id} stands REVOKED AND CANCELLED with immediate effect. Security deposit stands forfeited to the Government of Punjab.`
+        `Due to repeated non-compliance regarding ${activeIssueOrderHearing.hearing_purpose}, Small Mines Agreement Lease ${activeIssueOrderHearing.lease_id} is hereby CANCELLED with immediate effect. Security deposit stands forfeited to Government of the Punjab.`
       );
     } else if (category === 'Exonerated/Compliance Accepted') {
       setPenaltyAmount(0);
       setLeaseStatusUpdate('Active');
       setDecisionSummary(
-        `The lessee has produced certified clearance documents and treasury challans proving full satisfaction of statutory dues/boundary norms. Show-cause notice is hereby discharged and the lease restored to active standing unconditionally.`
+        `The lessee has submitted verified proof of compliance and cleared all statutory dues. The show-cause notice is discharged and the lease restored to active standing.`
       );
     } else if (category === 'Direction Issued') {
       setPenaltyAmount(0);
       setLeaseStatusUpdate('Show-Cause Issued');
       setDecisionSummary(
-        `A stern formal direction is issued under Rule 39. Lessee is given a final cure period of ${complianceDeadline} to rectify all deficiencies and submit verification report attested by the District Mining Officer, failing which cancellation proceedings shall follow.`
+        `Lessee is directed under Rule 39 to rectify all deficiencies within ${complianceDeadline} and submit a verified report from the District Mining Officer, failing which cancellation proceedings shall be initiated.`
       );
     } else if (category === 'Adjourned to New Date') {
       setPenaltyAmount(0);
-      setDecisionSummary(`Case adjourned for further scrutiny of joint boundary survey report.`);
+      setDecisionSummary(`Case adjourned for further verification of field survey report.`);
     }
   };
 
@@ -116,16 +105,15 @@ export const IssueOrderModal: React.FC = () => {
       decision_summary: decisionSummary,
       penalty_amount: decisionCategory === 'Penalty Imposed' ? Number(penaltyAmount) : undefined,
       compliance_deadline: complianceDeadline || undefined,
-      order_attachment_name: `Quasi_Judicial_Order_${orderNo.replace(/[^a-zA-Z0-9]/g, '_')}.pdf`,
+      order_attachment_name: `Order_${orderNo.replace(/[^a-zA-Z0-9]/g, '_')}.pdf`,
       presiding_officer: presidingOfficer,
       attendees,
-      legal_provisions: legalProvisions,
+      legal_provisions: "Punjab Mining Concession Rules 2002",
       dispatched,
     };
 
     issueOrder(activeIssueOrderHearing.hearing_id, orderData, leaseStatusUpdate);
     
-    // Automatically open the signed order document view for convenience
     const updatedHearing = {
       ...activeIssueOrderHearing,
       hearing_status: 'Decided' as const,
@@ -138,79 +126,56 @@ export const IssueOrderModal: React.FC = () => {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm overflow-y-auto no-print">
-      <div className="bg-slate-900 border border-slate-700 rounded-2xl w-full max-w-3xl shadow-2xl overflow-hidden my-6">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-xs overflow-y-auto no-print">
+      <div className="bg-white border border-slate-300 rounded-xl w-full max-w-2xl shadow-xl overflow-hidden my-6">
         
         {/* Header */}
-        <div className="bg-gradient-to-r from-slate-950 via-slate-900 to-slate-950 border-b border-slate-800 px-6 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-amber-950/80 border border-amber-500/40 flex items-center justify-center text-amber-400">
-              <Gavel className="w-5 h-5" />
+        <div className="bg-slate-900 px-6 py-4 flex items-center justify-between text-white">
+          <div className="flex items-center gap-2.5">
+            <div className="w-8 h-8 rounded-lg bg-amber-500 text-slate-950 flex items-center justify-center font-bold">
+              <Gavel className="w-4 h-4" />
             </div>
             <div>
-              <div className="flex items-center gap-2">
-                <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded bg-amber-500/10 text-amber-300 border border-amber-500/20">
-                  Quasi-Judicial Bench
-                </span>
-                <span className="text-xs text-slate-400">
-                  Case ID: {activeIssueOrderHearing.hearing_id}
-                </span>
-              </div>
-              <h3 className="text-lg font-bold text-slate-100">
-                Record & Issue Post-Hearing Determination
+              <h3 className="text-sm font-bold text-white">
+                Record Hearing Determination &amp; Order
               </h3>
+              <p className="text-[11px] text-slate-400">Notice Ref: {activeIssueOrderHearing.notice_reference_no}</p>
             </div>
           </div>
           <button 
             onClick={() => setActiveIssueOrderHearing(null)}
-            className="text-slate-400 hover:text-slate-100 p-1.5 rounded-lg hover:bg-slate-800 transition-colors"
+            className="text-slate-400 hover:text-white"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
-        {/* Case Info Banner */}
-        <div className="bg-slate-950/60 border-b border-slate-800/80 px-6 py-3 flex flex-wrap items-center justify-between gap-4 text-xs">
-          <div>
-            <span className="text-slate-400">Lessee / Company: </span>
-            <span className="font-semibold text-slate-200">{associatedLease?.lessee_name || 'N/A'}</span>
-          </div>
-          <div>
-            <span className="text-slate-400">Lease ID & Mineral: </span>
-            <span className="font-semibold text-emerald-400">{activeIssueOrderHearing.lease_id} ({associatedLease?.mineral_name})</span>
-          </div>
-          <div>
-            <span className="text-slate-400">District: </span>
-            <span className="font-semibold text-slate-200">{associatedLease?.district}</span>
-          </div>
-          <div>
-            <span className="text-slate-400">Hearing Date: </span>
-            <span className="font-semibold text-slate-200">
-              {new Date(activeIssueOrderHearing.hearing_date).toLocaleDateString()}
-            </span>
-          </div>
+        {/* Case Info Ribbon */}
+        <div className="bg-slate-50 border-b border-slate-200 px-6 py-2.5 flex flex-wrap items-center justify-between gap-3 text-xs text-slate-600">
+          <div>Company: <strong className="text-slate-900">{associatedLease?.lessee_name}</strong></div>
+          <div>Lease ID: <strong className="text-slate-900 font-mono">{activeIssueOrderHearing.lease_id}</strong></div>
+          <div>District: <strong className="text-slate-900">{associatedLease?.district}</strong></div>
         </div>
 
-        {/* Form Body */}
-        <form onSubmit={handleSubmit} className="p-6 space-y-5 max-h-[75vh] overflow-y-auto">
+        {/* Form */}
+        <form onSubmit={handleSubmit} className="p-6 space-y-4 max-h-[75vh] overflow-y-auto text-xs sm:text-sm">
           
-          {/* Order Details & Category Selection */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs font-semibold text-slate-300 mb-1.5">
-                Official Order Dispatch Number *
+              <label className="block text-xs font-semibold text-slate-700 mb-1">
+                Order Dispatch Number *
               </label>
               <input
                 type="text"
                 required
                 value={orderNo}
                 onChange={(e) => setOrderNo(e.target.value)}
-                className="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-100 focus:outline-none focus:border-amber-500 font-mono"
+                className="w-full bg-slate-50 border border-slate-300 rounded-lg p-2 text-xs text-slate-900 font-mono font-bold focus:bg-white focus:border-emerald-600"
               />
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-slate-300 mb-1.5">
+              <label className="block text-xs font-semibold text-slate-700 mb-1">
                 Order Date *
               </label>
               <input
@@ -218,15 +183,14 @@ export const IssueOrderModal: React.FC = () => {
                 required
                 value={orderDate}
                 onChange={(e) => setOrderDate(e.target.value)}
-                className="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-100 focus:outline-none focus:border-amber-500"
+                className="w-full bg-slate-50 border border-slate-300 rounded-lg p-2 text-xs text-slate-900 focus:bg-white focus:border-emerald-600"
               />
             </div>
           </div>
 
-          {/* Decision Category Tabs / Grid */}
           <div>
-            <label className="block text-xs font-semibold text-slate-300 mb-1.5">
-              Quasi-Judicial Determination Category *
+            <label className="block text-xs font-semibold text-slate-700 mb-1">
+              Decision Category *
             </label>
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
               {(['Penalty Imposed', 'Direction Issued', 'Lease Revoked/Cancelled', 'Exonerated/Compliance Accepted', 'Adjourned to New Date'] as DecisionCategory[]).map((cat) => (
@@ -234,30 +198,22 @@ export const IssueOrderModal: React.FC = () => {
                   type="button"
                   key={cat}
                   onClick={() => handleCategoryChange(cat)}
-                  className={`px-3 py-2.5 rounded-xl text-xs font-semibold border text-left transition-all flex flex-col justify-between ${
+                  className={`p-2 rounded-lg text-xs font-semibold border text-left transition-all ${
                     decisionCategory === cat
-                      ? 'bg-amber-950/60 border-amber-500 text-amber-200 shadow-md ring-1 ring-amber-500/50'
-                      : 'bg-slate-950 border-slate-800 text-slate-400 hover:border-slate-700 hover:text-slate-200'
+                      ? 'bg-amber-50 border-amber-600 text-amber-900 shadow-xs'
+                      : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50'
                   }`}
                 >
-                  <span>{cat}</span>
-                  <span className="text-[10px] text-slate-500 mt-1">
-                    {cat === 'Penalty Imposed' && 'Fine & treasury challan'}
-                    {cat === 'Direction Issued' && 'Time-bound compliance'}
-                    {cat === 'Lease Revoked/Cancelled' && 'Immediate cancellation'}
-                    {cat === 'Exonerated/Compliance Accepted' && 'Dismiss notice'}
-                    {cat === 'Adjourned to New Date' && 'Reschedule hearing'}
-                  </span>
+                  {cat}
                 </button>
               ))}
             </div>
           </div>
 
-          {/* Conditional Options: Penalty Amount & Compliance Deadline */}
           {decisionCategory === 'Penalty Imposed' && (
-            <div className="bg-amber-950/20 border border-amber-800/40 rounded-xl p-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="bg-amber-50 border border-amber-200 rounded-lg p-3 grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
-                <label className="block text-xs font-semibold text-amber-300 mb-1.5 flex items-center gap-1.5">
+                <label className="block text-xs font-bold text-amber-900 mb-1 flex items-center gap-1">
                   <DollarSign className="w-3.5 h-3.5" />
                   Penalty Amount (PKR) *
                 </label>
@@ -268,134 +224,107 @@ export const IssueOrderModal: React.FC = () => {
                   required
                   value={penaltyAmount}
                   onChange={(e) => setPenaltyAmount(Number(e.target.value))}
-                  className="w-full bg-slate-950 border border-amber-700/60 rounded-lg px-3 py-2 text-sm text-amber-100 font-mono focus:outline-none focus:border-amber-400"
+                  className="w-full bg-white border border-amber-300 rounded-lg p-1.5 text-xs text-amber-950 font-mono font-bold"
                 />
-                <span className="text-[11px] text-slate-400 mt-1 block">
-                  PKR {penaltyAmount.toLocaleString()} (Rupees {penaltyAmount >= 100000 ? `${(penaltyAmount/100000).toFixed(2)} Lakh` : ''})
-                </span>
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-slate-300 mb-1.5 flex items-center gap-1.5">
+                <label className="block text-xs font-bold text-amber-900 mb-1 flex items-center gap-1">
                   <Clock className="w-3.5 h-3.5" />
-                  Deposit Timeline *
+                  Payment Deadline
                 </label>
                 <input
                   type="text"
                   value={complianceDeadline}
                   onChange={(e) => setComplianceDeadline(e.target.value)}
-                  placeholder="e.g. 15 days from dispatch"
-                  className="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-100 focus:outline-none focus:border-amber-500"
+                  className="w-full bg-white border border-amber-300 rounded-lg p-1.5 text-xs text-slate-800"
                 />
               </div>
             </div>
           )}
 
-          {decisionCategory === 'Direction Issued' && (
-            <div className="bg-slate-950/80 border border-slate-800 rounded-xl p-4">
-              <label className="block text-xs font-semibold text-sky-300 mb-1.5 flex items-center gap-1.5">
-                <Clock className="w-3.5 h-3.5" />
-                Compliance Deadline for Lessee *
-              </label>
-              <input
-                type="text"
-                value={complianceDeadline}
-                onChange={(e) => setComplianceDeadline(e.target.value)}
-                placeholder="e.g. 14 days from date of dispatch"
-                className="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-100 focus:outline-none focus:border-sky-500"
-              />
-            </div>
-          )}
-
-          {/* Operative Part / Judgment Summary */}
           <div>
-            <label className="block text-xs font-semibold text-slate-300 mb-1.5 flex items-center justify-between">
-              <span>Executive Order Determination / Operative Part *</span>
-              <span className="text-[10px] text-slate-500">Official judicial determination record</span>
+            <label className="block text-xs font-semibold text-slate-700 mb-1">
+              Order Remarks / Operative Decision Summary *
             </label>
             <textarea
               required
               rows={4}
               value={decisionSummary}
               onChange={(e) => setDecisionSummary(e.target.value)}
-              className="w-full bg-slate-950 border border-slate-700 rounded-xl p-3 text-xs sm:text-sm text-slate-200 focus:outline-none focus:border-amber-500 leading-relaxed font-serif"
+              className="w-full bg-slate-50 border border-slate-300 rounded-lg p-2.5 text-xs text-slate-800 focus:bg-white focus:border-emerald-600 leading-relaxed"
             />
           </div>
 
-          {/* Attendees & Authority */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs font-semibold text-slate-300 mb-1.5">
+              <label className="block text-xs font-semibold text-slate-700 mb-1">
                 Presiding Authority
               </label>
               <input
                 type="text"
                 value={presidingOfficer}
                 onChange={(e) => setPresidingOfficer(e.target.value)}
-                className="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-amber-500"
+                className="w-full bg-slate-50 border border-slate-300 rounded-lg p-2 text-xs text-slate-800"
               />
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-slate-300 mb-1.5">
-                Parties Present / Attendees
+              <label className="block text-xs font-semibold text-slate-700 mb-1">
+                Attendees Present in Hearing
               </label>
               <input
                 type="text"
                 value={attendees}
                 onChange={(e) => setAttendees(e.target.value)}
-                className="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-amber-500"
+                className="w-full bg-slate-50 border border-slate-300 rounded-lg p-2 text-xs text-slate-800"
               />
             </div>
           </div>
 
-          {/* Associated Lease Status Sync */}
-          <div className="bg-slate-950/60 border border-slate-800 rounded-xl p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+          <div className="bg-slate-50 border border-slate-200 rounded-lg p-3 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
             <div>
-              <p className="text-xs font-semibold text-slate-200">Synchronize SMA Lease Master Status</p>
-              <p className="text-[11px] text-slate-400">Update agreement state based on this final quasi-judicial determination</p>
+              <span className="text-xs font-bold text-slate-800 block">Synchronize Lease Status</span>
+              <span className="text-[11px] text-slate-500">Update SMA master agreement standing</span>
             </div>
             <select
               value={leaseStatusUpdate}
               onChange={(e) => setLeaseStatusUpdate(e.target.value as LeaseStatus)}
-              className="bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-xs font-medium text-slate-200 focus:outline-none focus:border-emerald-500"
+              className="bg-white border border-slate-300 rounded px-2.5 py-1 text-xs text-slate-800 font-semibold"
             >
-              <option value="Active">Active (Exonerated / In Good Standing)</option>
-              <option value="Show-Cause Issued">Show-Cause Issued (Under Penalty / Notice)</option>
-              <option value="Suspended">Suspended / Cancelled (Operations Sealed)</option>
+              <option value="Active">Active</option>
+              <option value="Show-Cause Issued">Show-Cause Issued</option>
+              <option value="Suspended">Suspended / Cancelled</option>
               <option value="Expired">Expired</option>
             </select>
           </div>
 
-          {/* Formal Dispatch Checkbox */}
-          <div className="flex items-center gap-2.5 p-3 rounded-lg bg-emerald-950/30 border border-emerald-900/50">
+          <div className="flex items-center gap-2 pt-1">
             <input
               type="checkbox"
-              id="dispatchedToggle"
+              id="dispatchChk"
               checked={dispatched}
               onChange={(e) => setDispatched(e.target.checked)}
-              className="w-4 h-4 rounded text-emerald-600 focus:ring-emerald-500 bg-slate-950 border-slate-700 cursor-pointer"
+              className="w-4 h-4 rounded text-emerald-700"
             />
-            <label htmlFor="dispatchedToggle" className="text-xs text-slate-200 font-medium cursor-pointer">
-              Mark formal Quasi-Judicial Order as sealed, signed, and dispatched to all parties
+            <label htmlFor="dispatchChk" className="text-xs text-slate-700 font-medium cursor-pointer">
+              Mark order as signed, recorded, and dispatched to parties
             </label>
           </div>
 
-          {/* Footer Actions */}
-          <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-800">
+          <div className="flex items-center justify-end gap-2.5 pt-3 border-t border-slate-200">
             <button
               type="button"
               onClick={() => setActiveIssueOrderHearing(null)}
-              className="px-4 py-2 rounded-xl text-xs font-medium text-slate-400 hover:text-slate-200 hover:bg-slate-800 transition-colors"
+              className="px-3 py-1.5 text-xs text-slate-600 hover:text-slate-900"
             >
               Cancel
             </button>
             <button
               type="submit"
-              className="flex items-center gap-2 bg-amber-600 hover:bg-amber-500 text-slate-950 font-bold px-5 py-2.5 rounded-xl text-xs shadow-lg transition-all active:scale-95"
+              className="bg-[#0A6238] hover:bg-[#084e2c] text-white font-bold px-4 py-2 rounded-lg text-xs shadow-sm transition-all"
             >
-              <Gavel className="w-4 h-4" />
-              <span>Issue & Seal Executive Order</span>
+              Issue Order
             </button>
           </div>
 
