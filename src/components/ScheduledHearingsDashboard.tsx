@@ -417,26 +417,6 @@ export const ScheduledHearingsDashboard: React.FC = () => {
             </div>
           </div>
 
-          {/* Action CTAs */}
-          <div className="flex items-center gap-2 self-start lg:self-auto">
-            <button
-              onClick={() => setIsCauseListModalOpen(true)}
-              className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 hover:bg-slate-200 text-slate-800 border border-slate-300 transition-all shadow-xs"
-              title="Print formal Cause List for the Director's bench"
-            >
-              <Printer className="w-3.5 h-3.5 text-slate-600" />
-              <span>Print / Export Cause List</span>
-            </button>
-
-            <button
-              onClick={() => openScheduleModal()}
-              className="flex items-center gap-1.5 px-4 py-1.5 rounded-lg text-xs font-bold bg-[#01411C] hover:bg-[#0A5C36] text-white shadow-xs transition-all"
-            >
-              <Plus className="w-4 h-4 stroke-[2.5]" />
-              <span>+ Schedule Hearing</span>
-            </button>
-          </div>
-
         </div>
 
         {/* Row 2: Search Input & District / Status Dropdown Filters */}
@@ -527,7 +507,7 @@ export const ScheduledHearingsDashboard: React.FC = () => {
             <p className="text-xs text-slate-500 mt-1 max-w-sm mx-auto">
               No personal hearings match your current date, status, district, or search filters.
             </p>
-            <div className="mt-4 flex items-center justify-center gap-2">
+            <div className="mt-4 flex items-center justify-center">
               <button
                 onClick={() => {
                   setSearchTerm('');
@@ -535,15 +515,9 @@ export const ScheduledHearingsDashboard: React.FC = () => {
                   setStatusFilter('all');
                   setDistrictFilter('all');
                 }}
-                className="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold rounded-lg transition-all"
+                className="px-3.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold rounded-lg transition-all"
               >
-                Reset Filters
-              </button>
-              <button
-                onClick={() => openScheduleModal()}
-                className="px-3 py-1.5 bg-[#01411C] hover:bg-[#0A5C36] text-white text-xs font-bold rounded-lg transition-all"
-              >
-                + Schedule a Hearing
+                Reset All Filters
               </button>
             </div>
           </div>

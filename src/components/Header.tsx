@@ -74,10 +74,10 @@ export const Header: React.FC = () => {
             <button
               onClick={() => setIsCauseListModalOpen(true)}
               className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-white/10 hover:bg-white/20 text-white border border-white/20 transition-all shadow-xs"
-              title="Generate and print today's Bench Cause List"
+              title="Generate and print today's Cause List"
             >
               <Printer className="w-3.5 h-3.5 text-emerald-200" />
-              <span>Cause List</span>
+              <span>Print / Export Cause List</span>
             </button>
 
             {/* Primary CTA: Schedule Hearing */}
@@ -86,7 +86,7 @@ export const Header: React.FC = () => {
               className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-bold bg-[#D4AF37] hover:bg-[#c49f29] text-slate-950 shadow-sm transition-all transform active:scale-95"
             >
               <Plus className="w-4 h-4 stroke-[2.5]" />
-              <span>Schedule Hearing</span>
+              <span>+ Schedule Hearing</span>
             </button>
           </div>
 
