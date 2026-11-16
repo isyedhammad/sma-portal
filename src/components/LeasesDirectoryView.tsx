@@ -18,7 +18,7 @@ import {
   ArrowDown
 } from 'lucide-react';
 
-type LeaseSortField = 'id' | 'title' | 'type' | 'lessee' | 'district' | 'hearings';
+type LeaseSortField = 'id' | 'title' | 'type' | 'lessee' | 'district' | 'mineral' | 'hearings';
 type SortDirection = 'asc' | 'desc';
 
 export const LeasesDirectoryView: React.FC = () => {
@@ -146,7 +146,9 @@ export const LeasesDirectoryView: React.FC = () => {
         } else if (sortField === 'lessee') {
           cmp = a.lessee_name.localeCompare(b.lessee_name);
         } else if (sortField === 'district') {
-          cmp = (a.district + a.mineral).localeCompare(b.district + b.mineral);
+          cmp = a.district.localeCompare(b.district);
+        } else if (sortField === 'mineral') {
+          cmp = a.mineral.localeCompare(b.mineral);
         } else if (sortField === 'hearings') {
           const countA = leaseHearingsCountMap.get(a.lease_id) || 0;
           const countB = leaseHearingsCountMap.get(b.lease_id) || 0;
@@ -462,11 +464,12 @@ export const LeasesDirectoryView: React.FC = () => {
           <table className="w-full text-left border-collapse">
             <thead>
               <tr className="bg-slate-100/70 border-b border-slate-200">
-                {renderSortableHeader('Concession ID', 'id', { widthClass: 'w-40' })}
+                {renderSortableHeader('Concession ID', 'id', { widthClass: 'w-36' })}
                 {renderSortableHeader('Title & Site', 'title')}
                 {renderSortableHeader('Type', 'type', { align: 'center' })}
                 {renderSortableHeader('Lessee / Company', 'lessee')}
-                {renderSortableHeader('District & Mineral', 'district')}
+                {renderSortableHeader('District', 'district')}
+                {renderSortableHeader('Mineral', 'mineral')}
                 {renderSortableHeader('Hearings on Record', 'hearings', { align: 'center' })}
                 <th className="py-3 px-4 text-right text-[11px] font-bold text-slate-600 uppercase tracking-wider">
                   Actions
@@ -522,15 +525,19 @@ export const LeasesDirectoryView: React.FC = () => {
                       </div>
                     </td>
 
-                    {/* District & Mineral */}
+                    {/* District */}
                     <td className="py-3.5 px-4 whitespace-nowrap">
                       <div className="font-semibold text-slate-800 flex items-center gap-1">
-                        <MapPin className="w-3 h-3 text-emerald-700" />
+                        <MapPin className="w-3 h-3 text-emerald-700 flex-shrink-0" />
                         <span>{lease.district}</span>
                       </div>
-                      <div className="inline-block px-1.5 py-0.5 bg-slate-100 text-slate-700 text-[10px] rounded font-medium mt-1">
+                    </td>
+
+                    {/* Mineral */}
+                    <td className="py-3.5 px-4 whitespace-nowrap">
+                      <span className="inline-block px-2 py-0.5 bg-slate-100 text-slate-800 border border-slate-200/80 text-[11px] rounded font-semibold">
                         {lease.mineral}
-                      </div>
+                      </span>
                     </td>
 
                     {/* Total Hearings on Record */}
