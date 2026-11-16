@@ -500,25 +500,39 @@ export const ScheduledHearingsDashboard: React.FC = () => {
         {/* Table Content */}
         {filteredHearings.length === 0 ? (
           <div className="p-12 text-center">
-            <div className="w-12 h-12 rounded-full bg-slate-100 flex items-center justify-center mx-auto mb-3 text-slate-400">
-              <Calendar className="w-6 h-6" />
+            <div className="w-14 h-14 rounded-full bg-emerald-50 text-[#01411C] flex items-center justify-center mx-auto mb-3">
+              <Scale className="w-7 h-7" />
             </div>
-            <h3 className="text-sm font-bold text-slate-700">No Scheduled Hearings Found</h3>
-            <p className="text-xs text-slate-500 mt-1 max-w-sm mx-auto">
-              No personal hearings match your current date, status, district, or search filters.
+            <h3 className="text-base font-bold text-slate-800">
+              {hearings.length === 0 ? 'No Scheduled Hearings on Record' : 'No Scheduled Hearings Found'}
+            </h3>
+            <p className="text-xs text-slate-500 mt-1.5 max-w-md mx-auto leading-relaxed">
+              {hearings.length === 0
+                ? 'The quasi-judicial hearing schedule is currently clean. You can register and schedule personal hearings directly for any of the 1,836 Punjab mining concessions.'
+                : 'No personal hearings match your current date, status, district, or search filters.'}
             </p>
-            <div className="mt-4 flex items-center justify-center">
-              <button
-                onClick={() => {
-                  setSearchTerm('');
-                  setDateFilter('all');
-                  setStatusFilter('all');
-                  setDistrictFilter('all');
-                }}
-                className="px-3.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold rounded-lg transition-all"
-              >
-                Reset All Filters
-              </button>
+            <div className="mt-5 flex items-center justify-center gap-2.5">
+              {hearings.length === 0 ? (
+                <button
+                  onClick={() => openScheduleModal()}
+                  className="inline-flex items-center gap-2 px-4 py-2 bg-[#01411C] hover:bg-[#0A5C36] text-white text-xs font-bold rounded-lg shadow-sm transition-all transform active:scale-95"
+                >
+                  <Plus className="w-4 h-4 stroke-[2.5]" />
+                  <span>+ Schedule First Hearing</span>
+                </button>
+              ) : (
+                <button
+                  onClick={() => {
+                    setSearchTerm('');
+                    setDateFilter('all');
+                    setStatusFilter('all');
+                    setDistrictFilter('all');
+                  }}
+                  className="px-3.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold rounded-lg transition-all"
+                >
+                  Reset All Filters
+                </button>
+              )}
             </div>
           </div>
         ) : (

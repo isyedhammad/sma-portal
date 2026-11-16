@@ -24,7 +24,7 @@ import {
 } from '../services/cloudStorage';
 
 const STORAGE_KEY_LEASES = 'dgmm_sma_leases_v5';
-const STORAGE_KEY_HEARINGS = 'dgmm_sma_hearings_v5';
+const STORAGE_KEY_HEARINGS = 'dgmm_sma_hearings_v6';
 
 interface PortalContextType {
   // Data
@@ -125,10 +125,13 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   // Hearings state (Local cache fallback with seedData)
   const [hearings, setHearings] = useState<Hearing[]>(() => {
     try {
+      // Purge old demo storage keys to ensure clean start
+      localStorage.removeItem('dgmm_sma_hearings_v5');
+      localStorage.removeItem('dgmm_sma_hearings_v4');
       const saved = localStorage.getItem(STORAGE_KEY_HEARINGS);
       if (saved) {
         const parsed = JSON.parse(saved);
-        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+        if (Array.isArray(parsed)) return parsed;
       }
     } catch (e) {
       console.error('Failed reading cached hearings:', e);

@@ -144,33 +144,41 @@ export const CauseListModal: React.FC = () => {
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-200 text-[11px]">
-                {causeListHearings.map((h, idx) => (
-                  <tr key={h.hearing_id} className="hover:bg-slate-50">
-                    <td className="p-2.5 text-center font-bold text-slate-700 border-r border-slate-200">
-                      {idx + 1}
-                    </td>
-                    <td className="p-2.5 font-bold text-slate-900 border-r border-slate-200 whitespace-nowrap">
-                      {h.hearing_time || '10:30 AM'}
-                    </td>
-                    <td className="p-2.5 font-mono text-slate-700 border-r border-slate-200 text-[10px]">
-                      {h.notice_reference_no || 'N/A'}
-                    </td>
-                    <td className="p-2.5 font-bold text-[#01411C] border-r border-slate-200">
-                      <div>{h.lease_no}</div>
-                      <div className="text-[10px] text-slate-500 font-normal">{h.district} • {h.mineral}</div>
-                    </td>
-                    <td className="p-2.5 font-medium text-slate-900 border-r border-slate-200">
-                      {h.lessee_name}
-                    </td>
-                    <td className="p-2.5 text-slate-700 border-r border-slate-200">
-                      <div className="font-semibold text-slate-800">{h.purpose}</div>
-                      {h.stage && <div className="text-[10px] text-slate-500 italic">Stage: {h.stage}</div>}
-                    </td>
-                    <td className="p-2.5 text-center font-bold text-[10px]">
-                      {h.hearing_status}
+                {causeListHearings.length === 0 ? (
+                  <tr>
+                    <td colSpan={7} className="p-8 text-center text-slate-500 italic">
+                      No personal hearings listed for the selected date.
                     </td>
                   </tr>
-                ))}
+                ) : (
+                  causeListHearings.map((h, idx) => (
+                    <tr key={h.hearing_id} className="hover:bg-slate-50">
+                      <td className="p-2.5 text-center font-bold text-slate-700 border-r border-slate-200">
+                        {idx + 1}
+                      </td>
+                      <td className="p-2.5 font-bold text-slate-900 border-r border-slate-200 whitespace-nowrap">
+                        {h.hearing_time || '10:30 AM'}
+                      </td>
+                      <td className="p-2.5 font-mono text-slate-700 border-r border-slate-200 text-[10px]">
+                        {h.notice_reference_no || 'N/A'}
+                      </td>
+                      <td className="p-2.5 font-bold text-[#01411C] border-r border-slate-200">
+                        <div>{h.lease_no}</div>
+                        <div className="text-[10px] text-slate-500 font-normal">{h.district} • {h.mineral}</div>
+                      </td>
+                      <td className="p-2.5 font-medium text-slate-900 border-r border-slate-200">
+                        {h.lessee_name}
+                      </td>
+                      <td className="p-2.5 text-slate-700 border-r border-slate-200">
+                        <div className="font-semibold text-slate-800">{h.purpose}</div>
+                        {h.stage && <div className="text-[10px] text-slate-500 italic">Stage: {h.stage}</div>}
+                      </td>
+                      <td className="p-2.5 text-center font-bold text-[10px]">
+                        {h.hearing_status}
+                      </td>
+                    </tr>
+                  ))
+                )}
               </tbody>
             </table>
           </div>
