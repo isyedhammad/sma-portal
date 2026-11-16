@@ -1,332 +1,240 @@
 import React, { useState } from 'react';
 import { usePortal } from '../../context/PortalContext';
-import { PUNJAB_MINING_DISTRICTS } from '../../data/seedData';
-import { LeaseStatus } from '../../types';
-import { X, Plus, Layers } from 'lucide-react';
+import { Lease, MiningType, LeaseStatus } from '../../types';
+import {
+  X,
+  Plus,
+  Building,
+  MapPin,
+  Scale,
+  CheckCircle2
+} from 'lucide-react';
 
 export const AddLeaseModal: React.FC = () => {
-  const { activeAddLeaseModal, setActiveAddLeaseModal, addLease } = usePortal();
+  const {
+    isAddLeaseModalOpen,
+    setIsAddLeaseModalOpen,
+    addLease
+  } = usePortal();
 
-  const [miningType, setMiningType] = useState<'ML' | 'PL'>('ML');
-  const [leaseId, setLeaseId] = useState('');
+  const [leaseNo, setLeaseNo] = useState('');
   const [leaseTitle, setLeaseTitle] = useState('');
-  const [mineralName, setMineralName] = useState('Limestone');
   const [lesseeName, setLesseeName] = useState('');
-  const [proprietorRepresentative, setProprietorRepresentative] = useState('');
-  const [contactNumber, setContactNumber] = useState('+92 300 ');
+  const [miningType, setMiningType] = useState<MiningType>('ML');
   const [district, setDistrict] = useState('Attock');
-  const [tehsil, setTehsil] = useState('');
-  const [leaseStatus, setLeaseStatus] = useState<LeaseStatus>('Active');
+  const [mineral, setMineral] = useState('Limestone');
+  const [status, setStatus] = useState<LeaseStatus>('Active');
   const [areaAcreage, setAreaAcreage] = useState<number>(50);
   const [grantDate, setGrantDate] = useState('2024-01-01');
   const [expiryDate, setExpiryDate] = useState('2029-01-01');
-  const [annualRentPkr, setAnnualRentPkr] = useState<number>(2500000);
+  const [contactNumber, setContactNumber] = useState('+92 300 0000000');
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  if (!activeAddLeaseModal) return null;
+  if (!isAddLeaseModalOpen) return null;
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
-    addLease({
-      lease_id: leaseId.trim() || undefined,
-      mining_type: miningType,
-      lease_title: leaseTitle.trim(),
-      mineral_name: mineralName.trim(),
-      lessee_name: lesseeName.trim(),
-      proprietor_representative: proprietorRepresentative.trim(),
-      contact_number: contactNumber.trim(),
-      district,
-      tehsil: tehsil.trim() || undefined,
-      lease_status: leaseStatus,
-      area_acreage: Number(areaAcreage),
-      grant_date: grantDate,
-      expiry_date: expiryDate,
-      annual_rent_pkr: Number(annualRentPkr),
-    });
-
-    setActiveAddLeaseModal(false);
+    setIsSubmitting(true);
+    try {
+      await addLease({
+        lease_id: leaseNo.trim(),
+        lease_no: leaseNo.trim(),
+        lease_title: leaseTitle.trim(),
+        lessee_name: lesseeName.trim(),
+        mining_type: miningType,
+        district,
+        mineral,
+        status,
+        area_acreage: Number(areaAcreage),
+        grant_date: grantDate,
+        expiry_date: expiryDate,
+        contact_number: contactNumber.trim()
+      });
+      setIsAddLeaseModalOpen(false);
+      // Reset
+      setLeaseNo('');
+      setLeaseTitle('');
+      setLesseeName('');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-xs overflow-y-auto no-print">
-      <div className="bg-white border border-slate-300 rounded-xl w-full max-w-2xl shadow-xl overflow-hidden my-6">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-black/60 backdrop-blur-xs overflow-y-auto">
+      <div className="bg-white text-slate-900 rounded-xl w-full max-w-xl shadow-2xl overflow-hidden my-auto border border-slate-200">
         
         {/* Header */}
-        <div className="bg-slate-900 px-6 py-4 flex items-center justify-between text-white">
+        <div className="bg-[#01411C] text-white px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-lg bg-emerald-600 flex items-center justify-center text-white">
-              <Layers className="w-4 h-4" />
+            <div className="p-1.5 rounded-lg bg-emerald-900/60 border border-emerald-700">
+              <Plus className="w-5 h-5 text-emerald-300" />
             </div>
             <div>
-              <h3 className="text-sm font-bold text-white">
-                Add Small Scale Mining (SMA/T) Lease
-              </h3>
-              <p className="text-[11px] text-slate-400">Directorate General of Mines &amp; Minerals Punjab</p>
+              <h2 className="text-base font-bold tracking-tight">
+                Add Small Mines Concession
+              </h2>
+              <p className="text-xs text-emerald-200">
+                Register Mining Lease (ML) or Prospecting License (PL)
+              </p>
             </div>
           </div>
-          <button 
-            onClick={() => setActiveAddLeaseModal(false)}
-            className="text-slate-400 hover:text-white"
+
+          <button
+            onClick={() => setIsAddLeaseModalOpen(false)}
+            className="text-emerald-200 hover:text-white p-1 rounded-lg hover:bg-emerald-800 transition-colors"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
-        {/* Form */}
-        <form onSubmit={handleSubmit} className="p-6 space-y-4 max-h-[75vh] overflow-y-auto text-xs sm:text-sm">
+        {/* Form Body */}
+        <form onSubmit={handleSubmit} className="p-6 space-y-3.5 text-xs">
           
-          {/* Concession Classification: ML vs PL */}
-          <div>
-            <label className="block text-xs font-bold text-slate-700 mb-1.5 uppercase">
-              Concession Classification (ML vs PL) *
-            </label>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <label className={`p-3 rounded-lg border cursor-pointer flex flex-col justify-between transition-all ${
-                miningType === 'ML' ? 'bg-emerald-50 border-emerald-500 ring-2 ring-emerald-500/30' : 'bg-slate-50 border-slate-300'
-              }`}>
-                <div className="flex items-center justify-between">
-                  <span className="font-bold text-slate-900 text-xs flex items-center gap-1.5">
-                    <span className="w-2 h-2 rounded-full bg-emerald-600"></span>
-                    Mining Lease (ML)
-                  </span>
-                  <input
-                    type="radio"
-                    name="miningType"
-                    value="ML"
-                    checked={miningType === 'ML'}
-                    onChange={() => setMiningType('ML')}
-                    className="text-emerald-600"
-                  />
-                </div>
-                <span className="text-[10px] text-slate-500 mt-1">Rule 29 (PMR 2002) — Commercial extraction rights</span>
-              </label>
-
-              <label className={`p-3 rounded-lg border cursor-pointer flex flex-col justify-between transition-all ${
-                miningType === 'PL' ? 'bg-sky-50 border-sky-500 ring-2 ring-sky-500/30' : 'bg-slate-50 border-slate-300'
-              }`}>
-                <div className="flex items-center justify-between">
-                  <span className="font-bold text-slate-900 text-xs flex items-center gap-1.5">
-                    <span className="w-2 h-2 rounded-full bg-sky-600"></span>
-                    Prospecting License (PL)
-                  </span>
-                  <input
-                    type="radio"
-                    name="miningType"
-                    value="PL"
-                    checked={miningType === 'PL'}
-                    onChange={() => setMiningType('PL')}
-                    className="text-sky-600"
-                  />
-                </div>
-                <span className="text-[10px] text-slate-500 mt-1">Rule 14 (PMR 2002) — Exploration &amp; sampling rights</span>
-              </label>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1">
-                Lease ID (Auto-assigned if left blank)
-              </label>
-              <input
-                type="text"
-                placeholder="e.g. SMA-ATK-2026-0150"
-                value={leaseId}
-                onChange={(e) => setLeaseId(e.target.value)}
-                className="w-full bg-slate-50 border border-slate-300 rounded-lg p-2 text-xs text-slate-900 font-mono"
-              />
-            </div>
-
-            <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1">
-                Mineral Type *
+              <label className="font-semibold text-slate-700 block mb-1">
+                Concession ID / Lease No *
               </label>
               <input
                 type="text"
                 required
-                value={mineralName}
-                onChange={(e) => setMineralName(e.target.value)}
-                placeholder="e.g. Limestone, Coal, Silica Sand"
-                className="w-full bg-slate-50 border border-slate-300 rounded-lg p-2 text-xs text-slate-900"
+                placeholder="e.g. SMA-ATT-0099"
+                value={leaseNo}
+                onChange={(e) => setLeaseNo(e.target.value)}
+                className="w-full border border-slate-300 rounded-lg p-2 bg-white text-slate-800 font-mono"
               />
+            </div>
+
+            <div>
+              <label className="font-semibold text-slate-700 block mb-1">
+                Concession Category *
+              </label>
+              <select
+                value={miningType}
+                onChange={(e) => setMiningType(e.target.value as MiningType)}
+                className="w-full border border-slate-300 rounded-lg p-2 bg-white text-slate-800 font-bold"
+              >
+                <option value="ML">ML - Mining Lease</option>
+                <option value="PL">PL - Prospecting License</option>
+              </select>
             </div>
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-slate-700 mb-1">
-              Lease Title / Site Name *
+            <label className="font-semibold text-slate-700 block mb-1">
+              Concession Title &amp; Location *
             </label>
             <input
               type="text"
               required
+              placeholder="e.g. Limestone Quarry Block No. 4, Hasanabdal Hills"
               value={leaseTitle}
               onChange={(e) => setLeaseTitle(e.target.value)}
-              placeholder="e.g. Ordinary Sand Block No. 14, Ravi Bed"
-              className="w-full bg-slate-50 border border-slate-300 rounded-lg p-2 text-xs text-slate-900"
+              className="w-full border border-slate-300 rounded-lg p-2 bg-white text-slate-800"
             />
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1">
-                Lessee / Company Name *
-              </label>
-              <input
-                type="text"
-                required
-                value={lesseeName}
-                onChange={(e) => setLesseeName(e.target.value)}
-                placeholder="e.g. M/s Indus Valley Mineral Developers"
-                className="w-full bg-slate-50 border border-slate-300 rounded-lg p-2 text-xs text-slate-900"
-              />
-            </div>
-
-            <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1">
-                Proprietor / Representative Name *
-              </label>
-              <input
-                type="text"
-                required
-                value={proprietorRepresentative}
-                onChange={(e) => setProprietorRepresentative(e.target.value)}
-                placeholder="e.g. Malik Muhammad Tariq"
-                className="w-full bg-slate-50 border border-slate-300 rounded-lg p-2 text-xs text-slate-900"
-              />
-            </div>
+          <div>
+            <label className="font-semibold text-slate-700 block mb-1">
+              Lessee / Company Name *
+            </label>
+            <input
+              type="text"
+              required
+              placeholder="e.g. M/s Margalla Mining &amp; Mineral Developers"
+              value={lesseeName}
+              onChange={(e) => setLesseeName(e.target.value)}
+              className="w-full border border-slate-300 rounded-lg p-2 bg-white text-slate-800"
+            />
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1">
+              <label className="font-semibold text-slate-700 block mb-1">
                 District *
               </label>
-              <select
+              <input
+                type="text"
+                required
                 value={district}
                 onChange={(e) => setDistrict(e.target.value)}
-                className="w-full bg-slate-50 border border-slate-300 rounded-lg p-2 text-xs text-slate-900"
-              >
-                {PUNJAB_MINING_DISTRICTS.map(d => (
-                  <option key={d} value={d}>{d}</option>
-                ))}
-              </select>
-            </div>
-
-            <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1">
-                Tehsil
-              </label>
-              <input
-                type="text"
-                value={tehsil}
-                onChange={(e) => setTehsil(e.target.value)}
-                placeholder="e.g. Fateh Jang"
-                className="w-full bg-slate-50 border border-slate-300 rounded-lg p-2 text-xs text-slate-900"
+                className="w-full border border-slate-300 rounded-lg p-2 bg-white text-slate-800"
               />
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1">
-                Contact Phone *
+              <label className="font-semibold text-slate-700 block mb-1">
+                Mineral *
               </label>
               <input
                 type="text"
                 required
-                value={contactNumber}
-                onChange={(e) => setContactNumber(e.target.value)}
-                className="w-full bg-slate-50 border border-slate-300 rounded-lg p-2 text-xs text-slate-900"
+                value={mineral}
+                onChange={(e) => setMineral(e.target.value)}
+                className="w-full border border-slate-300 rounded-lg p-2 bg-white text-slate-800"
               />
             </div>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <div className="grid grid-cols-3 gap-3">
             <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1">
-                Area (Acres) *
+              <label className="font-semibold text-slate-700 block mb-1">
+                Area (Acres)
               </label>
               <input
                 type="number"
-                step="0.01"
-                required
                 value={areaAcreage}
                 onChange={(e) => setAreaAcreage(Number(e.target.value))}
-                className="w-full bg-slate-50 border border-slate-300 rounded-lg p-2 text-xs text-slate-900"
+                className="w-full border border-slate-300 rounded-lg p-2 bg-white text-slate-800"
               />
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1">
-                Initial Status *
-              </label>
-              <select
-                value={leaseStatus}
-                onChange={(e) => setLeaseStatus(e.target.value as LeaseStatus)}
-                className="w-full bg-slate-50 border border-slate-300 rounded-lg p-2 text-xs text-slate-900"
-              >
-                <option value="Active">Active</option>
-                <option value="Show-Cause Issued">Show-Cause Issued</option>
-                <option value="Suspended">Suspended</option>
-                <option value="Expired">Expired</option>
-              </select>
-            </div>
-
-            <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1">
-                Annual Royalty (PKR)
-              </label>
-              <input
-                type="number"
-                step="100000"
-                value={annualRentPkr}
-                onChange={(e) => setAnnualRentPkr(Number(e.target.value))}
-                className="w-full bg-slate-50 border border-slate-300 rounded-lg p-2 text-xs text-slate-900 font-mono"
-              />
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1">
+              <label className="font-semibold text-slate-700 block mb-1">
                 Grant Date
               </label>
               <input
                 type="date"
                 value={grantDate}
                 onChange={(e) => setGrantDate(e.target.value)}
-                className="w-full bg-slate-50 border border-slate-300 rounded-lg p-2 text-xs text-slate-900"
+                className="w-full border border-slate-300 rounded-lg p-2 bg-white text-slate-800"
               />
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1">
+              <label className="font-semibold text-slate-700 block mb-1">
                 Expiry Date
               </label>
               <input
                 type="date"
                 value={expiryDate}
                 onChange={(e) => setExpiryDate(e.target.value)}
-                className="w-full bg-slate-50 border border-slate-300 rounded-lg p-2 text-xs text-slate-900"
+                className="w-full border border-slate-300 rounded-lg p-2 bg-white text-slate-800"
               />
             </div>
           </div>
 
-          <div className="flex items-center justify-end gap-2.5 pt-3 border-t border-slate-200">
+          <div className="pt-4 border-t border-slate-200 flex items-center justify-end gap-2.5">
             <button
               type="button"
-              onClick={() => setActiveAddLeaseModal(false)}
-              className="px-3 py-1.5 text-xs text-slate-600 hover:text-slate-900"
+              onClick={() => setIsAddLeaseModalOpen(false)}
+              className="px-4 py-2 font-semibold text-slate-600 hover:text-slate-800"
             >
               Cancel
             </button>
             <button
               type="submit"
-              className="bg-[#0A6238] hover:bg-[#084e2c] text-white font-bold px-4 py-2 rounded-lg text-xs shadow-sm transition-all"
+              disabled={isSubmitting}
+              className="px-5 py-2 bg-[#01411C] hover:bg-[#0A5C36] text-white font-bold rounded-lg shadow-sm transition-all flex items-center gap-1.5"
             >
-              Add Lease Record
+              <CheckCircle2 className="w-4 h-4" />
+              <span>{isSubmitting ? 'Registering...' : 'Save & Register Lease'}</span>
             </button>
           </div>
 
         </form>
+
       </div>
     </div>
   );

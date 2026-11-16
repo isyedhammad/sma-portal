@@ -1,62 +1,73 @@
 import React from 'react';
 import { PortalProvider, usePortal } from './context/PortalContext';
-import { Sidebar } from './components/Sidebar';
-import { Topbar } from './components/Topbar';
-import { ToastContainer } from './components/ToastContainer';
-import { DashboardPage } from './pages/DashboardPage';
-import { ScheduleHearingPage } from './pages/ScheduleHearingPage';
-import { HearingOrdersLedgerPage } from './pages/HearingOrdersLedgerPage';
-import { LeasesDirectoryPage } from './pages/LeasesDirectoryPage';
-import { AnalyticsPage } from './pages/AnalyticsPage';
-import { IssueOrderModal } from './components/modals/IssueOrderModal';
-import { NoticeDocketModal } from './components/modals/NoticeDocketModal';
-import { OrderDocumentModal } from './components/modals/OrderDocumentModal';
+import { Header } from './components/Header';
+import { ScheduledHearingsDashboard } from './components/ScheduledHearingsDashboard';
+import { LeasesDirectoryView } from './components/LeasesDirectoryView';
+import { HearingHistoryDrawer } from './components/HearingHistoryDrawer';
+import { ScheduleHearingModal } from './components/ScheduleHearingModal';
+import { UpdateOutcomeModal } from './components/UpdateOutcomeModal';
 import { CauseListModal } from './components/modals/CauseListModal';
 import { AddLeaseModal } from './components/modals/AddLeaseModal';
+import { BulkUploadModal } from './components/modals/BulkUploadModal';
+import { CloudSettingsModal } from './components/modals/CloudSettingsModal';
+import { ToastContainer } from './components/ToastContainer';
 
 const PortalMainContent: React.FC = () => {
   const { activeTab } = usePortal();
 
   return (
-    <div className="flex h-screen w-screen overflow-hidden bg-[#F8FAFC]">
-      {/* Left Sidebar */}
-      <Sidebar />
+    <div className="min-h-screen bg-[#F8FAFC] flex flex-col text-slate-900 selection:bg-emerald-200 selection:text-emerald-950 font-sans">
+      
+      {/* Official Government Header & Minimalist 2-Tab Navigation */}
+      <Header />
 
       {/* Main Content Area */}
-      <div className="flex-1 flex flex-col min-w-0 h-screen overflow-hidden">
-        {/* Topbar */}
-        <Topbar />
+      <main className="flex-1 pb-16">
+        {activeTab === 'hearings' ? (
+          <ScheduledHearingsDashboard />
+        ) : (
+          <LeasesDirectoryView />
+        )}
+      </main>
 
-        {/* Scrollable Page Canvas */}
-        <main className="flex-1 overflow-y-auto bg-[#F8FAFC] pb-12">
-          {activeTab === 'dashboard' && <DashboardPage />}
-          {activeTab === 'schedule' && <ScheduleHearingPage />}
-          {activeTab === 'ledger' && <HearingOrdersLedgerPage />}
-          {activeTab === 'leases' && <LeasesDirectoryPage />}
-          {activeTab === 'analytics' && <AnalyticsPage />}
+      {/* Official Punjab Government Footer */}
+      <footer className="no-print border-t border-slate-200 bg-white py-5 px-6 text-xs text-slate-500">
+        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3">
+          <div className="flex items-center gap-2">
+            <img
+              src="assets/punjab_logo.png"
+              alt="Punjab Emblem"
+              className="w-5 h-5 object-contain"
+              onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
+            />
+            <span className="font-semibold text-slate-700">
+              Directorate General of Mines &amp; Minerals, Government of the Punjab
+            </span>
+          </div>
+          <div className="flex items-center gap-3 text-slate-400 text-[11px]">
+            <span>Small Mines Assistance/Titles (SMA)</span>
+            <span>•</span>
+            <span>Punjab Mining Concession Rules 2002</span>
+            <span>•</span>
+            <span>Quasi-Judicial Bench System</span>
+          </div>
+        </div>
+      </footer>
 
-          {/* Simple Government Footer */}
-          <footer className="no-print border-t border-slate-200 mt-12 py-6 px-6 text-xs text-slate-500 flex flex-col sm:flex-row items-center justify-between gap-3 max-w-7xl mx-auto">
-            <div className="flex items-center gap-2">
-              <img src="assets/punjab_logo.png" alt="" className="w-5 h-5 object-contain" />
-              <span>Directorate General of Mines &amp; Minerals, Government of the Punjab</span>
-            </div>
-            <div>
-              <span>Regulated under Punjab Mining Concession Rules 2002</span>
-            </div>
-          </footer>
-        </main>
-      </div>
+      {/* Option A: Right-Side Slide-Out Drawer for Chronological Hearing History */}
+      <HearingHistoryDrawer />
 
       {/* Modals & Dialogs */}
-      <IssueOrderModal />
-      <NoticeDocketModal />
-      <OrderDocumentModal />
+      <ScheduleHearingModal />
+      <UpdateOutcomeModal />
       <CauseListModal />
       <AddLeaseModal />
+      <BulkUploadModal />
+      <CloudSettingsModal />
 
-      {/* Toast Notifications */}
+      {/* Toast Feedback */}
       <ToastContainer />
+
     </div>
   );
 };
