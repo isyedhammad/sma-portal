@@ -34,7 +34,7 @@ export const CauseListModal: React.FC = () => {
           <div className="flex items-center gap-2">
             <span className="w-2 h-2 rounded-full bg-emerald-400"></span>
             <span className="text-xs font-bold tracking-wide uppercase">
-              Official Cause List • Quasi-Judicial Bench Day Sheet
+              Official Cause List • Personal Hearings Day Sheet
             </span>
           </div>
 
@@ -113,7 +113,7 @@ export const CauseListModal: React.FC = () => {
           <div className="grid grid-cols-2 text-xs border border-slate-300 rounded-lg p-3 bg-slate-50/60 gap-y-1">
             <div>
               <span className="font-bold text-slate-700">Presiding Officer: </span>
-              <span className="text-slate-900">Director SMA/T (Licensing Authority)</span>
+              <span className="text-slate-900">Licensing Authority</span>
             </div>
             <div className="text-right">
               <span className="font-bold text-slate-700">Bench Date: </span>
@@ -121,7 +121,7 @@ export const CauseListModal: React.FC = () => {
             </div>
             <div>
               <span className="font-bold text-slate-700">Court Venue: </span>
-              <span className="text-slate-900">Court Room of Director SMA/T, Poonch House, Multan Road, Lahore</span>
+              <span className="text-slate-900">Court Room of Licensing Authority, Poonch House, Multan Road, Lahore</span>
             </div>
             <div className="text-right">
               <span className="font-bold text-slate-700">Total Cases Listed: </span>
@@ -178,12 +178,12 @@ export const CauseListModal: React.FC = () => {
           {/* Signature Footer */}
           <div className="pt-10 grid grid-cols-2 text-xs border-t border-slate-200">
             <div>
-              <div className="text-slate-600 font-medium">Reader / Court Officer to Director SMA/T</div>
+              <div className="text-slate-600 font-medium">Reader / Court Officer to Licensing Authority</div>
               <div className="text-[10px] text-slate-400 mt-0.5">Directorate General of Mines &amp; Minerals, Punjab</div>
             </div>
             <div className="text-right">
-              <div className="font-bold text-slate-900">Director SMA/T (Licensing Authority)</div>
-              <div className="text-[10px] text-slate-500">Presiding Officer • Quasi-Judicial Bench</div>
+              <div className="font-bold text-slate-900">Licensing Authority</div>
+              <div className="text-[10px] text-slate-500">Presiding Officer • Mines &amp; Minerals Department</div>
             </div>
           </div>
 

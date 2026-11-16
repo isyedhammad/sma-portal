@@ -1,6 +1,6 @@
 /**
  * Directorate General of Mines & Minerals, Government of the Punjab
- * SMA Licensing & Quasi-Judicial Hearing Management System
+ * SMA Hearing Management System
  * 
  * Cloud Database Configuration Guide
  * -----------------------------------

@@ -458,7 +458,7 @@ export const HearingHistoryDrawer: React.FC = () => {
                             {h.order_no && (
                               <div className="mt-2.5 p-2.5 bg-emerald-50 rounded-lg border border-emerald-200 text-xs space-y-1">
                                 <div className="flex items-center justify-between text-emerald-900 font-bold">
-                                  <span>Quasi-Judicial Order: {h.order_no}</span>
+                                  <span>Formal Order: {h.order_no}</span>
                                   <span>{h.order_date || h.hearing_date}</span>
                                 </div>
                                 {h.decision_category && (
@@ -474,7 +474,7 @@ export const HearingHistoryDrawer: React.FC = () => {
 
                         {/* Presiding Bench Info */}
                         <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-400">
-                          <span>{h.presiding_officer || 'Director SMA/T'}</span>
+                          <span>{h.presiding_officer || 'Licensing Authority'}</span>
                           <span>Lahore Bench</span>
                         </div>
 
@@ -490,7 +490,7 @@ export const HearingHistoryDrawer: React.FC = () => {
 
           {/* Drawer Footer */}
           <div className="bg-slate-100 px-6 py-3 border-t border-slate-200 flex items-center justify-between text-xs text-slate-500 flex-shrink-0">
-            <span>Official DGMM Quasi-Judicial Record</span>
+            <span>Official DGMM Hearing Record</span>
             <button
               onClick={closeDrawer}
               className="px-3 py-1 bg-white hover:bg-slate-200 border border-slate-300 rounded text-slate-700 font-medium"

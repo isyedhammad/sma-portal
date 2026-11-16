@@ -53,8 +53,8 @@ export interface Hearing {
   hearing_status: HearingStatus;
   
   // Administrative
-  presiding_officer?: string; // Default: "Director SMA/T - Licensing Authority"
-  hearing_venue?: string; // Default: "Court Room of Director SMA/T, Poonch House, Multan Road, Lahore"
+  presiding_officer?: string; // Default: "Licensing Authority"
+  hearing_venue?: string; // Default: "Court Room of Licensing Authority, Poonch House, Multan Road, Lahore"
   notice_reference_no?: string; // e.g. "DGM&M/SMA/H-104/2026"
   created_at: string;
   updated_at?: string;

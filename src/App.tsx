@@ -10,6 +10,7 @@ import { CauseListModal } from './components/modals/CauseListModal';
 import { AddLeaseModal } from './components/modals/AddLeaseModal';
 import { BulkUploadModal } from './components/modals/BulkUploadModal';
 import { CloudSettingsModal } from './components/modals/CloudSettingsModal';
+import { RulesModal } from './components/modals/RulesModal';
 import { ToastContainer } from './components/ToastContainer';
 
 const PortalMainContent: React.FC = () => {
@@ -49,7 +50,7 @@ const PortalMainContent: React.FC = () => {
             <span>•</span>
             <span>Punjab Mining Concession Rules 2002</span>
             <span>•</span>
-            <span>Quasi-Judicial Bench System</span>
+            <span>Personal Hearings Management System</span>
           </div>
         </div>
       </footer>
@@ -61,6 +62,7 @@ const PortalMainContent: React.FC = () => {
       <ScheduleHearingModal />
       <UpdateOutcomeModal />
       <CauseListModal />
+      <RulesModal />
       <AddLeaseModal />
       <BulkUploadModal />
       <CloudSettingsModal />

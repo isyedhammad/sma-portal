@@ -56,6 +56,8 @@ interface PortalContextType {
   // Other Modals
   isCauseListModalOpen: boolean;
   setIsCauseListModalOpen: (open: boolean) => void;
+  isRulesModalOpen: boolean;
+  setIsRulesModalOpen: (open: boolean) => void;
   isAddLeaseModalOpen: boolean;
   setIsAddLeaseModalOpen: (open: boolean) => void;
   isBulkUploadModalOpen: boolean;
@@ -149,6 +151,7 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   const [selectedHearingForOutcome, setSelectedHearingForOutcome] = useState<Hearing | null>(null);
 
   const [isCauseListModalOpen, setIsCauseListModalOpen] = useState(false);
+  const [isRulesModalOpen, setIsRulesModalOpen] = useState(false);
   const [isAddLeaseModalOpen, setIsAddLeaseModalOpen] = useState(false);
   const [isBulkUploadModalOpen, setIsBulkUploadModalOpen] = useState(false);
   const [isCloudSettingsOpen, setIsCloudSettingsOpen] = useState(false);
@@ -379,8 +382,8 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         stage: data.stage || 'Initial Show-Cause Reply',
         remarks_orders: data.remarks_orders || '',
         hearing_status: (data.hearing_status as HearingStatus) || 'Scheduled',
-        presiding_officer: data.presiding_officer || 'Director SMA/T - Licensing Authority',
-        hearing_venue: data.hearing_venue || 'Court Room of Director SMA/T, Poonch House, Multan Road, Lahore',
+        presiding_officer: data.presiding_officer || 'Licensing Authority',
+        hearing_venue: data.hearing_venue || 'Court Room of Licensing Authority, Poonch House, Multan Road, Lahore',
         notice_reference_no: data.notice_reference_no || `DGM&M/SMA/H-${String(hearings.length + 105).padStart(3, '0')}/2026`,
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString()
@@ -548,6 +551,8 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         closeOutcomeModal,
         isCauseListModalOpen,
         setIsCauseListModalOpen,
+        isRulesModalOpen,
+        setIsRulesModalOpen,
         isAddLeaseModalOpen,
         setIsAddLeaseModalOpen,
         isBulkUploadModalOpen,

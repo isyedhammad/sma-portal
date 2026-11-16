@@ -145,7 +145,7 @@ export const fetchCloudHearings = async (): Promise<Hearing[] | null> => {
         next_hearing_time: row.next_hearing_time,
         adjournment_reason: row.adjournment_reason,
         hearing_status: row.hearing_status || 'Scheduled',
-        presiding_officer: row.presiding_officer || 'Director SMA/T - Licensing Authority',
+        presiding_officer: row.presiding_officer || 'Licensing Authority',
         hearing_venue: row.hearing_venue,
         notice_reference_no: row.notice_reference_no,
         created_at: row.created_at,

@@ -61,8 +61,8 @@ export const ScheduleHearingModal: React.FC = () => {
   const [customPurpose, setCustomPurpose] = useState('');
   const [stage, setStage] = useState('Initial Notice / Show-Cause Reply');
   const [noticeRef, setNoticeRef] = useState('');
-  const [presidingOfficer, setPresidingOfficer] = useState('Director SMA/T - Licensing Authority');
-  const [hearingVenue, setHearingVenue] = useState('Court Room of Director SMA/T, Poonch House, Multan Road, Lahore');
+  const [presidingOfficer, setPresidingOfficer] = useState('Licensing Authority');
+  const [hearingVenue, setHearingVenue] = useState('Court Room of Licensing Authority, Poonch House, Multan Road, Lahore');
   const [remarks, setRemarks] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -89,8 +89,8 @@ export const ScheduleHearingModal: React.FC = () => {
       setCustomPurpose(hearingToEdit.purpose);
       setStage(hearingToEdit.stage || 'Initial Notice / Show-Cause Reply');
       setNoticeRef(hearingToEdit.notice_reference_no || '');
-      setPresidingOfficer(hearingToEdit.presiding_officer || 'Director SMA/T - Licensing Authority');
-      setHearingVenue(hearingToEdit.hearing_venue || 'Court Room of Director SMA/T, Poonch House, Multan Road, Lahore');
+      setPresidingOfficer(hearingToEdit.presiding_officer || 'Licensing Authority');
+      setHearingVenue(hearingToEdit.hearing_venue || 'Court Room of Licensing Authority, Poonch House, Multan Road, Lahore');
       setRemarks(hearingToEdit.remarks_orders || '');
       setIsInlineCreateMode(false);
     } else if (selectedLeaseForSchedule) {
@@ -219,7 +219,7 @@ export const ScheduleHearingModal: React.FC = () => {
                 {hearingToEdit ? 'Edit Personal Hearing Notice' : 'Schedule Statutory Personal Hearing'}
               </h2>
               <p className="text-xs text-emerald-200">
-                Rule 48/56, Punjab Mining Concession Rules 2002 • Office of Director SMA/T
+                Rule 48/56, Punjab Mining Concession Rules 2002 • Office of the Licensing Authority
               </p>
             </div>
           </div>
@@ -544,7 +544,7 @@ export const ScheduleHearingModal: React.FC = () => {
                   <option value="Verification of Treasury Challans">Verification of Treasury Challans</option>
                   <option value="DMO Field Survey & Boundary Verification">DMO Field Survey &amp; Boundary Verification</option>
                   <option value="Final Arguments & Submissions">Final Arguments &amp; Submissions</option>
-                  <option value="Quasi-Judicial Order Announcement">Quasi-Judicial Order Announcement</option>
+                  <option value="Final Order Announcement">Final Order Announcement</option>
                 </select>
               </div>
 

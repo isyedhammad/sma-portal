@@ -221,7 +221,7 @@ export const UpdateOutcomeModal: React.FC = () => {
             <div className="p-3.5 bg-emerald-50 rounded-lg border border-emerald-200 space-y-3 text-xs">
               <span className="font-bold text-emerald-900 block flex items-center gap-1.5">
                 <FileCheck className="w-4 h-4 text-emerald-700" />
-                Quasi-Judicial Order Formal Details
+                Formal Order Details
               </span>
 
               <div className="grid grid-cols-2 gap-3">

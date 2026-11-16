@@ -35,7 +35,7 @@ export const saveStoredCloudConfig = (config: CloudConfig): void => {
  */
 export const SUPABASE_SQL_SCHEMA = `-- ==============================================================
 -- Directorate General of Mines & Minerals, Government of the Punjab
--- SMA Licensing & Quasi-Judicial Hearing Management System Schema
+-- SMA Hearing Management System Schema
 -- ==============================================================
 
 -- 1. Leases Table
@@ -79,7 +79,7 @@ CREATE TABLE IF NOT EXISTS hearings (
   next_hearing_time TEXT,
   adjournment_reason TEXT,
   hearing_status TEXT DEFAULT 'Scheduled',
-  presiding_officer TEXT DEFAULT 'Director SMA/T - Licensing Authority',
+  presiding_officer TEXT DEFAULT 'Licensing Authority',
   hearing_venue TEXT,
   notice_reference_no TEXT,
   created_at TIMESTAMPTZ DEFAULT NOW(),

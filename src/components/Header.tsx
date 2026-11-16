@@ -3,24 +3,18 @@ import { usePortal } from '../context/PortalContext';
 import {
   CalendarDays,
   FolderKanban,
-  Cloud,
-  CloudOff,
-  CloudCheck,
-  RefreshCw,
   Printer,
   Plus,
-  Scale
+  Scale,
+  BookOpen
 } from 'lucide-react';
 
 export const Header: React.FC = () => {
   const {
     activeTab,
     setActiveTab,
-    cloudSyncStatus,
-    lastSyncedAt,
-    isCloudConnected,
-    setIsCloudSettingsOpen,
     setIsCauseListModalOpen,
+    setIsRulesModalOpen,
     openScheduleModal,
     summaryStats
   } = usePortal();
@@ -56,57 +50,24 @@ export const Header: React.FC = () => {
                 </span>
               </div>
               <h1 className="text-lg sm:text-xl font-bold tracking-tight text-white flex items-center gap-2">
-                <span>SMA Licensing &amp; Quasi-Judicial Hearing System</span>
-                <span className="hidden sm:inline-flex items-center px-2 py-0.5 rounded text-[11px] font-medium bg-emerald-800 text-emerald-100 border border-emerald-700">
-                  Director SMA/T
-                </span>
+                <span>SMA Hearing Management System</span>
               </h1>
               <p className="text-xs text-emerald-200/90 hidden sm:block">
-                Small Mines Assistance/Titles • Quasi-Judicial Personal Hearings &amp; Concession Ledger
+                Small Mines Assistance/Titles (SMA) • Statutory Personal Hearings Portal
               </p>
             </div>
           </div>
 
-          {/* Right Header Controls: Cloud Status + Quick CTAs */}
+          {/* Right Header Controls: Rules PDF + Quick CTAs */}
           <div className="flex items-center gap-2.5 self-start md:self-auto flex-wrap">
-            {/* Cloud Sync Status Indicator */}
+            {/* Rules 2002 PDF Button */}
             <button
-              onClick={() => setIsCloudSettingsOpen(true)}
-              title={
-                isCloudConnected
-                  ? `Cloud Connected (Supabase). Last synced: ${lastSyncedAt || 'Just now'}`
-                  : 'Central Government Cloud Ledger (PostgreSQL / Supabase).'
-              }
-              className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium transition-all border ${
-                cloudSyncStatus === 'synced'
-                  ? 'bg-emerald-900/70 border-emerald-500/50 text-emerald-100 hover:bg-emerald-800'
-                  : cloudSyncStatus === 'connecting'
-                  ? 'bg-amber-900/60 border-amber-500/50 text-amber-200 hover:bg-amber-800'
-                  : 'bg-emerald-950/60 border-emerald-700/50 text-emerald-200 hover:bg-emerald-900'
-              }`}
+              onClick={() => setIsRulesModalOpen(true)}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-emerald-900/80 hover:bg-emerald-800 text-emerald-100 border border-emerald-600/60 transition-all shadow-xs"
+              title="View and download Punjab Mining Concession Rules 2002 (PDF)"
             >
-              <div className="relative flex items-center justify-center">
-                {cloudSyncStatus === 'synced' ? (
-                  <>
-                    <span className="w-2 h-2 rounded-full bg-emerald-400"></span>
-                    <span className="absolute -inset-0.5 rounded-full bg-emerald-400/40 animate-ping"></span>
-                  </>
-                ) : cloudSyncStatus === 'connecting' ? (
-                  <RefreshCw className="w-3.5 h-3.5 animate-spin text-amber-300" />
-                ) : (
-                  <span className="w-2 h-2 rounded-full bg-emerald-300"></span>
-                )}
-              </div>
-              <span className="font-semibold">
-                {cloudSyncStatus === 'synced'
-                  ? 'Cloud Synced'
-                  : cloudSyncStatus === 'connecting'
-                  ? 'Cloud Syncing...'
-                  : 'Cloud Database'}
-              </span>
-              <span className="text-[10px] text-emerald-300/80 underline decoration-dotted ml-0.5">
-                Cloud
-              </span>
+              <BookOpen className="w-3.5 h-3.5 text-emerald-300" />
+              <span>Rules 2002 (PDF)</span>
             </button>
 
             {/* Quick Cause List Print Button */}

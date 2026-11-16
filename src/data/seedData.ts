@@ -38,8 +38,8 @@ export const INITIAL_HEARINGS: Hearing[] = [
     stage: "Final Arguments / Compliance Verification",
     remarks_orders: "Case taken up for final compliance. Lessee representative present. Verified challans of PKR 1,200,000 produced before the Bench. DMO Attock verification awaited.",
     hearing_status: "Scheduled",
-    presiding_officer: "Director SMA/T - Licensing Authority",
-    hearing_venue: "Court Room of Director SMA/T, Poonch House, Multan Road, Lahore",
+    presiding_officer: "Licensing Authority",
+    hearing_venue: "Court Room of Licensing Authority, Poonch House, Multan Road, Lahore",
     notice_reference_no: "DGM&M/SMA/H-104/2026",
     created_at: "2026-11-05T09:00:00Z"
   },
@@ -63,8 +63,8 @@ export const INITIAL_HEARINGS: Hearing[] = [
     next_hearing_time: "10:30 AM",
     adjournment_reason: "Granted 14 days to deposit remaining treasury dues and submit DMO verification report.",
     hearing_status: "Adjourned",
-    presiding_officer: "Director SMA/T - Licensing Authority",
-    hearing_venue: "Court Room of Director SMA/T, Poonch House, Multan Road, Lahore",
+    presiding_officer: "Licensing Authority",
+    hearing_venue: "Court Room of Licensing Authority, Poonch House, Multan Road, Lahore",
     notice_reference_no: "DGM&M/SMA/H-089/2026",
     created_at: "2026-10-20T10:00:00Z"
   },
@@ -88,8 +88,8 @@ export const INITIAL_HEARINGS: Hearing[] = [
     next_hearing_time: "11:00 AM",
     adjournment_reason: "Adjourned on request of lessee to reconcile treasury challans with DMO Attock.",
     hearing_status: "Adjourned",
-    presiding_officer: "Director SMA/T - Licensing Authority",
-    hearing_venue: "Court Room of Director SMA/T, Poonch House, Multan Road, Lahore",
+    presiding_officer: "Licensing Authority",
+    hearing_venue: "Court Room of Licensing Authority, Poonch House, Multan Road, Lahore",
     notice_reference_no: "DGM&M/SMA/H-072/2026",
     created_at: "2026-10-01T08:30:00Z"
   },
@@ -109,8 +109,8 @@ export const INITIAL_HEARINGS: Hearing[] = [
     stage: "Evidence & Survey Overlay Verification",
     remarks_orders: "GIS satellite drone survey overlay submitted by GIS Cell indicating 35-meter open excavation beyond pillar C-4. Lessee representative summoned to explain encroachment.",
     hearing_status: "Scheduled",
-    presiding_officer: "Director SMA/T - Licensing Authority",
-    hearing_venue: "Court Room of Director SMA/T, Poonch House, Multan Road, Lahore",
+    presiding_officer: "Licensing Authority",
+    hearing_venue: "Court Room of Licensing Authority, Poonch House, Multan Road, Lahore",
     notice_reference_no: "DGM&M/SMA/H-105/2026",
     created_at: "2026-11-06T10:00:00Z"
   },
@@ -131,8 +131,8 @@ export const INITIAL_HEARINGS: Hearing[] = [
     next_hearing_time: "11:30 AM",
     adjournment_reason: "Joint boundary demarcation ordered with survey team.",
     hearing_status: "Adjourned",
-    presiding_officer: "Director SMA/T - Licensing Authority",
-    hearing_venue: "Court Room of Director SMA/T, Poonch House, Multan Road, Lahore",
+    presiding_officer: "Licensing Authority",
+    hearing_venue: "Court Room of Licensing Authority, Poonch House, Multan Road, Lahore",
     notice_reference_no: "DGM&M/SMA/H-081/2026",
     created_at: "2026-10-10T09:00:00Z"
   },
@@ -152,8 +152,8 @@ export const INITIAL_HEARINGS: Hearing[] = [
     stage: "Reply Submission",
     remarks_orders: "Notice issued for consecutive non-submission of monthly production logs for July, August, and September 2026 under Rule 39 PMR 2002.",
     hearing_status: "Scheduled",
-    presiding_officer: "Director SMA/T - Licensing Authority",
-    hearing_venue: "Court Room of Director SMA/T, Poonch House, Multan Road, Lahore",
+    presiding_officer: "Licensing Authority",
+    hearing_venue: "Court Room of Licensing Authority, Poonch House, Multan Road, Lahore",
     notice_reference_no: "DGM&M/SMA/H-106/2026",
     created_at: "2026-11-07T11:00:00Z"
   },
@@ -173,8 +173,8 @@ export const INITIAL_HEARINGS: Hearing[] = [
     stage: "Evidence Examination",
     remarks_orders: "Inspection report of field squad indicates unauthorized extraction by sub-lessee without sanction of Competent Authority.",
     hearing_status: "Scheduled",
-    presiding_officer: "Director SMA/T - Licensing Authority",
-    hearing_venue: "Court Room of Director SMA/T, Poonch House, Multan Road, Lahore",
+    presiding_officer: "Licensing Authority",
+    hearing_venue: "Court Room of Licensing Authority, Poonch House, Multan Road, Lahore",
     notice_reference_no: "DGM&M/SMA/H-107/2026",
     created_at: "2026-11-08T09:30:00Z"
   },
@@ -194,8 +194,8 @@ export const INITIAL_HEARINGS: Hearing[] = [
     stage: "Final Hearing Concluded",
     remarks_orders: "Bench heard both sides at length. Inspector of Mines submitted photographic proof of steep quarry face exceeding permissible angles. Counsel for lessee completed arguments. Order reserved for written determination.",
     hearing_status: "Order Reserved",
-    presiding_officer: "Director SMA/T - Licensing Authority",
-    hearing_venue: "Court Room of Director SMA/T, Poonch House, Multan Road, Lahore",
+    presiding_officer: "Licensing Authority",
+    hearing_venue: "Court Room of Licensing Authority, Poonch House, Multan Road, Lahore",
     notice_reference_no: "DGM&M/SMA/H-095/2026",
     created_at: "2026-10-25T14:00:00Z"
   },
@@ -218,8 +218,8 @@ export const INITIAL_HEARINGS: Hearing[] = [
     order_no: "DGM&M/SMA/ORD-2026-085",
     decision_category: "Exonerated/Notice Discharged",
     hearing_status: "Disposed",
-    presiding_officer: "Director SMA/T - Licensing Authority",
-    hearing_venue: "Court Room of Director SMA/T, Poonch House, Multan Road, Lahore",
+    presiding_officer: "Licensing Authority",
+    hearing_venue: "Court Room of Licensing Authority, Poonch House, Multan Road, Lahore",
     notice_reference_no: "DGM&M/SMA/H-085/2026",
     created_at: "2026-10-18T12:00:00Z"
   }

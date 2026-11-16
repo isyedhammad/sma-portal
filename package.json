@@ -16,6 +16,7 @@
     "autoprefixer": "^10.6.2",
     "gh-pages": "^6.3.0",
     "lucide-react": "^1.68.0",
+    "pdf-lib": "^1.17.1",
     "postcss": "^8.5.32",
     "react": "^19.3.1",
     "react-dom": "^19.3.1",
