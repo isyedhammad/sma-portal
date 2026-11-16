@@ -25,7 +25,7 @@ import {
 } from 'lucide-react';
 
 type DateFilterType = 'today' | 'upcoming7' | 'all' | 'custom';
-type SortField = 'date' | 'lease' | 'lessee' | 'district' | 'purpose' | 'status';
+type SortField = 'date' | 'title' | 'lessee' | 'district' | 'mineral' | 'purpose' | 'status';
 type SortDirection = 'asc' | 'desc';
 
 export const ScheduledHearingsDashboard: React.FC = () => {
@@ -45,6 +45,7 @@ export const ScheduledHearingsDashboard: React.FC = () => {
   const [customDate, setCustomDate] = useState('2026-11-16');
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [districtFilter, setDistrictFilter] = useState<string>('all');
+  const [mineralFilter, setMineralFilter] = useState<string>('all');
 
   // Column Header Sorting State
   const [sortField, setSortField] = useState<SortField>('date');
@@ -69,6 +70,15 @@ export const ScheduledHearingsDashboard: React.FC = () => {
     const set = new Set<string>();
     hearings.forEach(h => {
       if (h.district) set.add(h.district);
+    });
+    return Array.from(set).sort();
+  }, [hearings]);
+
+  // Extract distinct minerals for filter
+  const distinctMinerals = useMemo(() => {
+    const set = new Set<string>();
+    hearings.forEach(h => {
+      if (h.mineral) set.add(h.mineral);
     });
     return Array.from(set).sort();
   }, [hearings]);
@@ -111,7 +121,12 @@ export const ScheduledHearingsDashboard: React.FC = () => {
           return false;
         }
 
-        // 4. Date Filter
+        // 4. Mineral Filter
+        if (mineralFilter !== 'all' && h.mineral !== mineralFilter) {
+          return false;
+        }
+
+        // 5. Date Filter
         if (dateFilter === 'today') {
           return h.hearing_date === TODAY_STR;
         } else if (dateFilter === 'upcoming7') {
@@ -128,12 +143,16 @@ export const ScheduledHearingsDashboard: React.FC = () => {
           const timeA = new Date(a.hearing_date + 'T' + (a.hearing_time || '00:00')).getTime();
           const timeB = new Date(b.hearing_date + 'T' + (b.hearing_time || '00:00')).getTime();
           cmp = isNaN(timeA) || isNaN(timeB) ? a.hearing_date.localeCompare(b.hearing_date) : timeA - timeB;
-        } else if (sortField === 'lease') {
-          cmp = a.lease_no.localeCompare(b.lease_no);
+        } else if (sortField === 'title') {
+          const tA = a.lease_title || a.lease_no;
+          const tB = b.lease_title || b.lease_no;
+          cmp = tA.localeCompare(tB, undefined, { numeric: true });
         } else if (sortField === 'lessee') {
           cmp = a.lessee_name.localeCompare(b.lessee_name);
         } else if (sortField === 'district') {
-          cmp = (a.district + a.mineral).localeCompare(b.district + b.mineral);
+          cmp = a.district.localeCompare(b.district);
+        } else if (sortField === 'mineral') {
+          cmp = a.mineral.localeCompare(b.mineral);
         } else if (sortField === 'purpose') {
           cmp = a.purpose.localeCompare(b.purpose);
         } else if (sortField === 'status') {
@@ -147,6 +166,7 @@ export const ScheduledHearingsDashboard: React.FC = () => {
     searchTerm,
     statusFilter,
     districtFilter,
+    mineralFilter,
     dateFilter,
     customDate,
     sortField,
@@ -221,7 +241,7 @@ export const ScheduledHearingsDashboard: React.FC = () => {
     field: SortField,
     options?: {
       hasFilter?: boolean;
-      filterType?: 'district' | 'status' | 'date';
+      filterType?: 'district' | 'mineral' | 'status' | 'date';
       align?: 'left' | 'center' | 'right';
       widthClass?: string;
     }
@@ -255,7 +275,7 @@ export const ScheduledHearingsDashboard: React.FC = () => {
             </span>
           </button>
 
-          {/* Optional Direct Header Filter Dropdown */}
+          {/* Optional Direct Header Filter Dropdown for District */}
           {options?.hasFilter && options.filterType === 'district' && (
             <div className="relative">
               <button
@@ -291,6 +311,49 @@ export const ScheduledHearingsDashboard: React.FC = () => {
                     <option value="all">All Districts ({distinctDistricts.length})</option>
                     {distinctDistricts.map(d => (
                       <option key={d} value={d}>{d}</option>
+                    ))}
+                  </select>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Optional Direct Header Filter Dropdown for Mineral */}
+          {options?.hasFilter && options.filterType === 'mineral' && (
+            <div className="relative">
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setActiveHeaderFilter(activeHeaderFilter === 'mineral' ? null : 'mineral');
+                }}
+                className={`p-1 rounded hover:bg-slate-200 transition-colors ${
+                  mineralFilter !== 'all' ? 'text-emerald-700 font-bold bg-emerald-50' : 'text-slate-400'
+                }`}
+                title="Filter by Mineral"
+              >
+                <Filter className="w-3 h-3" />
+              </button>
+
+              {activeHeaderFilter === 'mineral' && (
+                <div
+                  className="absolute right-0 top-full mt-1 bg-white border border-slate-200 shadow-xl rounded-lg p-2 z-30 min-w-[160px] text-xs font-normal normal-case"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <div className="text-[10px] font-bold uppercase text-slate-500 mb-1.5 px-1">
+                    Filter by Mineral:
+                  </div>
+                  <select
+                    value={mineralFilter}
+                    onChange={(e) => {
+                      setMineralFilter(e.target.value);
+                      setActiveHeaderFilter(null);
+                    }}
+                    className="w-full text-xs p-1.5 border border-slate-300 rounded bg-slate-50"
+                  >
+                    <option value="all">All Minerals ({distinctMinerals.length})</option>
+                    {distinctMinerals.map(m => (
+                      <option key={m} value={m}>{m}</option>
                     ))}
                   </select>
                 </div>
@@ -457,6 +520,21 @@ export const ScheduledHearingsDashboard: React.FC = () => {
             </select>
           </div>
 
+          {/* Mineral Filter Dropdown */}
+          <div className="flex items-center gap-2 w-full sm:w-auto">
+            <Scale className="w-3.5 h-3.5 text-slate-400" />
+            <select
+              value={mineralFilter}
+              onChange={(e) => setMineralFilter(e.target.value)}
+              className="text-xs bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-slate-700 focus:outline-none focus:bg-white focus:border-emerald-700"
+            >
+              <option value="all">All Minerals ({distinctMinerals.length})</option>
+              {distinctMinerals.map(m => (
+                <option key={m} value={m}>{m}</option>
+              ))}
+            </select>
+          </div>
+
           {/* Status Filter Dropdown */}
           <div className="flex items-center gap-2 w-full sm:w-auto">
             <Filter className="w-3.5 h-3.5 text-slate-400" />
@@ -527,6 +605,7 @@ export const ScheduledHearingsDashboard: React.FC = () => {
                     setDateFilter('all');
                     setStatusFilter('all');
                     setDistrictFilter('all');
+                    setMineralFilter('all');
                   }}
                   className="px-3.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold rounded-lg transition-all"
                 >
@@ -541,9 +620,10 @@ export const ScheduledHearingsDashboard: React.FC = () => {
               <thead>
                 <tr className="bg-slate-100/70 border-b border-slate-200">
                   {renderSortableHeader('Hearing Date & Time', 'date', { widthClass: 'w-44' })}
-                  {renderSortableHeader('Lease Concession', 'lease')}
+                  {renderSortableHeader('Title', 'title')}
                   {renderSortableHeader('Lessee / Company', 'lessee')}
-                  {renderSortableHeader('District & Mineral', 'district', { hasFilter: true, filterType: 'district' })}
+                  {renderSortableHeader('District', 'district', { hasFilter: true, filterType: 'district' })}
+                  {renderSortableHeader('Mineral', 'mineral', { hasFilter: true, filterType: 'mineral' })}
                   {renderSortableHeader('Purpose / Stage', 'purpose')}
                   {renderSortableHeader('Status', 'status', { align: 'center', hasFilter: true, filterType: 'status' })}
                   <th className="py-3 px-4 text-right text-[11px] font-bold text-slate-600 uppercase tracking-wider">
@@ -585,11 +665,11 @@ export const ScheduledHearingsDashboard: React.FC = () => {
                         </div>
                       </td>
 
-                      {/* Column 2: Lease No & Title */}
+                      {/* Column 2: Title */}
                       <td className="py-3.5 px-4">
                         <div className="flex items-center gap-1.5">
                           <span className="font-bold text-[#01411C] group-hover:underline">
-                            {h.lease_no}
+                            {h.lease_title || h.lease_no}
                           </span>
                           <span
                             className={`px-1.5 py-0.2 rounded text-[10px] font-black uppercase ${
@@ -601,9 +681,6 @@ export const ScheduledHearingsDashboard: React.FC = () => {
                           >
                             {isMiningLease ? 'ML' : 'PL'}
                           </span>
-                        </div>
-                        <div className="text-[11px] text-slate-600 line-clamp-1 mt-0.5 max-w-xs font-medium">
-                          {h.lease_title}
                         </div>
                         {h.notice_reference_no && (
                           <div className="text-[10px] text-slate-400 font-mono mt-0.5">
@@ -619,15 +696,19 @@ export const ScheduledHearingsDashboard: React.FC = () => {
                         </div>
                       </td>
 
-                      {/* Column 4: District & Mineral */}
+                      {/* Column 4: District */}
                       <td className="py-3.5 px-4 whitespace-nowrap">
                         <div className="flex items-center gap-1 text-slate-800 font-semibold">
                           <MapPin className="w-3 h-3 text-emerald-700 flex-shrink-0" />
                           <span>{h.district}</span>
                         </div>
-                        <div className="inline-block px-1.5 py-0.5 bg-slate-100 text-slate-700 text-[10px] rounded font-medium mt-1">
+                      </td>
+
+                      {/* Column 5: Mineral */}
+                      <td className="py-3.5 px-4 whitespace-nowrap">
+                        <span className="inline-block px-2 py-0.5 bg-slate-100 text-slate-800 border border-slate-200/80 text-[11px] rounded font-semibold">
                           {h.mineral}
-                        </div>
+                        </span>
                       </td>
 
                       {/* Column 5: Purpose & Stage */}

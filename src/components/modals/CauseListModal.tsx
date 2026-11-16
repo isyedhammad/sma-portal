@@ -136,9 +136,11 @@ export const CauseListModal: React.FC = () => {
                 <tr className="bg-slate-100 border-b border-slate-300 font-bold text-slate-900 uppercase text-[10px]">
                   <th className="p-2.5 w-12 text-center border-r border-slate-200">Sr. #</th>
                   <th className="p-2.5 w-24 border-r border-slate-200">Time</th>
-                  <th className="p-2.5 w-32 border-r border-slate-200">Notice Ref</th>
-                  <th className="p-2.5 w-36 border-r border-slate-200">Concession No</th>
+                  <th className="p-2.5 w-28 border-r border-slate-200">Notice Ref</th>
+                  <th className="p-2.5 w-44 border-r border-slate-200">Title</th>
                   <th className="p-2.5 border-r border-slate-200">Lessee / Mining Company</th>
+                  <th className="p-2.5 w-24 border-r border-slate-200">District</th>
+                  <th className="p-2.5 w-24 border-r border-slate-200">Mineral</th>
                   <th className="p-2.5 border-r border-slate-200">Purpose / Grounds</th>
                   <th className="p-2.5 w-24 text-center">Status</th>
                 </tr>
@@ -146,7 +148,7 @@ export const CauseListModal: React.FC = () => {
               <tbody className="divide-y divide-slate-200 text-[11px]">
                 {causeListHearings.length === 0 ? (
                   <tr>
-                    <td colSpan={7} className="p-8 text-center text-slate-500 italic">
+                    <td colSpan={9} className="p-8 text-center text-slate-500 italic">
                       No personal hearings listed for the selected date.
                     </td>
                   </tr>
@@ -163,11 +165,16 @@ export const CauseListModal: React.FC = () => {
                         {h.notice_reference_no || 'N/A'}
                       </td>
                       <td className="p-2.5 font-bold text-[#01411C] border-r border-slate-200">
-                        <div>{h.lease_no}</div>
-                        <div className="text-[10px] text-slate-500 font-normal">{h.district} • {h.mineral}</div>
+                        <div className="font-semibold">{h.lease_title || h.lease_no}</div>
                       </td>
                       <td className="p-2.5 font-medium text-slate-900 border-r border-slate-200">
                         {h.lessee_name}
+                      </td>
+                      <td className="p-2.5 text-slate-800 font-medium border-r border-slate-200 whitespace-nowrap">
+                        {h.district}
+                      </td>
+                      <td className="p-2.5 text-slate-800 font-medium border-r border-slate-200 whitespace-nowrap">
+                        {h.mineral}
                       </td>
                       <td className="p-2.5 text-slate-700 border-r border-slate-200">
                         <div className="font-semibold text-slate-800">{h.purpose}</div>
