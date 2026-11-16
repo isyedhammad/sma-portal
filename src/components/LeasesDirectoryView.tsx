@@ -12,8 +12,14 @@ import {
   MapPin,
   Layers,
   ChevronRight,
-  Database
+  Database,
+  ArrowUpDown,
+  ArrowUp,
+  ArrowDown
 } from 'lucide-react';
+
+type LeaseSortField = 'id' | 'title' | 'type' | 'lessee' | 'district' | 'hearings';
+type SortDirection = 'asc' | 'desc';
 
 export const LeasesDirectoryView: React.FC = () => {
   const {
@@ -32,6 +38,20 @@ export const LeasesDirectoryView: React.FC = () => {
   const [selectedMineral, setSelectedMineral] = useState<string>('all');
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 25;
+
+  // Sorting State
+  const [sortField, setSortField] = useState<LeaseSortField>('id');
+  const [sortDirection, setSortDirection] = useState<SortDirection>('asc');
+
+  const handleSort = (field: LeaseSortField) => {
+    if (sortField === field) {
+      setSortDirection(prev => (prev === 'asc' ? 'desc' : 'asc'));
+    } else {
+      setSortField(field);
+      setSortDirection('asc');
+    }
+    setCurrentPage(1);
+  };
 
   // Extract unique districts & minerals
   const { districts, minerals, counts } = useMemo(() => {
@@ -69,41 +89,81 @@ export const LeasesDirectoryView: React.FC = () => {
     };
   }, [leases]);
 
-  // Filtered Leases
-  const filteredLeases = useMemo(() => {
-    return leases.filter(l => {
-      // 1. Text Search
-      if (searchTerm.trim()) {
-        const q = searchTerm.toLowerCase();
-        const match =
-          l.lease_no.toLowerCase().includes(q) ||
-          l.lease_title.toLowerCase().includes(q) ||
-          l.lessee_name.toLowerCase().includes(q) ||
-          l.district.toLowerCase().includes(q) ||
-          l.mineral.toLowerCase().includes(q);
-        if (!match) return false;
-      }
-
-      // 2. Mining Type (ML vs PL)
-      if (selectedType !== 'all') {
-        const isPl = l.mining_type === 'PL' || l.lease_title.includes('PL') || l.lease_no.includes('PL');
-        if (selectedType === 'PL' && !isPl) return false;
-        if (selectedType === 'ML' && isPl) return false;
-      }
-
-      // 3. District
-      if (selectedDistrict !== 'all' && l.district !== selectedDistrict) {
-        return false;
-      }
-
-      // 4. Mineral
-      if (selectedMineral !== 'all' && l.mineral !== selectedMineral) {
-        return false;
-      }
-
-      return true;
+  // Map of lease_id -> hearings count for instant sorting
+  const leaseHearingsCountMap = useMemo(() => {
+    const map = new Map<string, number>();
+    leases.forEach(l => {
+      map.set(l.lease_id, getHearingsForLease(l.lease_id).length);
     });
-  }, [leases, searchTerm, selectedType, selectedDistrict, selectedMineral]);
+    return map;
+  }, [leases, getHearingsForLease]);
+
+  // Filtered & Sorted Leases
+  const filteredLeases = useMemo(() => {
+    return leases
+      .filter(l => {
+        // 1. Text Search
+        if (searchTerm.trim()) {
+          const q = searchTerm.toLowerCase();
+          const match =
+            l.lease_no.toLowerCase().includes(q) ||
+            l.lease_title.toLowerCase().includes(q) ||
+            l.lessee_name.toLowerCase().includes(q) ||
+            l.district.toLowerCase().includes(q) ||
+            l.mineral.toLowerCase().includes(q);
+          if (!match) return false;
+        }
+
+        // 2. Mining Type (ML vs PL)
+        if (selectedType !== 'all') {
+          const isPl = l.mining_type === 'PL' || l.lease_title.includes('PL') || l.lease_no.includes('PL');
+          if (selectedType === 'PL' && !isPl) return false;
+          if (selectedType === 'ML' && isPl) return false;
+        }
+
+        // 3. District
+        if (selectedDistrict !== 'all' && l.district !== selectedDistrict) {
+          return false;
+        }
+
+        // 4. Mineral
+        if (selectedMineral !== 'all' && l.mineral !== selectedMineral) {
+          return false;
+        }
+
+        return true;
+      })
+      .sort((a, b) => {
+        let cmp = 0;
+        if (sortField === 'id') {
+          cmp = a.lease_no.localeCompare(b.lease_no, undefined, { numeric: true });
+        } else if (sortField === 'title') {
+          cmp = a.lease_title.localeCompare(b.lease_title);
+        } else if (sortField === 'type') {
+          const typeA = a.mining_type || (a.lease_title.includes('PL') ? 'PL' : 'ML');
+          const typeB = b.mining_type || (b.lease_title.includes('PL') ? 'PL' : 'ML');
+          cmp = typeA.localeCompare(typeB);
+        } else if (sortField === 'lessee') {
+          cmp = a.lessee_name.localeCompare(b.lessee_name);
+        } else if (sortField === 'district') {
+          cmp = (a.district + a.mineral).localeCompare(b.district + b.mineral);
+        } else if (sortField === 'hearings') {
+          const countA = leaseHearingsCountMap.get(a.lease_id) || 0;
+          const countB = leaseHearingsCountMap.get(b.lease_id) || 0;
+          cmp = countA - countB;
+        }
+        return sortDirection === 'asc' ? cmp : -cmp;
+      });
+  }, [
+    leases,
+    searchTerm,
+    selectedType,
+    selectedDistrict,
+    selectedMineral,
+    sortField,
+    sortDirection,
+    leaseHearingsCountMap
+  ]);
 
   // Pagination
   const totalPages = Math.ceil(filteredLeases.length / pageSize) || 1;
@@ -111,6 +171,46 @@ export const LeasesDirectoryView: React.FC = () => {
     const start = (currentPage - 1) * pageSize;
     return filteredLeases.slice(start, start + pageSize);
   }, [filteredLeases, currentPage, pageSize]);
+
+  // Clickable sorting column header
+  const renderSortableHeader = (
+    label: string,
+    field: LeaseSortField,
+    options?: {
+      align?: 'left' | 'center' | 'right';
+      widthClass?: string;
+    }
+  ) => {
+    const isSorted = sortField === field;
+    const align = options?.align || 'left';
+    const widthClass = options?.widthClass || '';
+
+    return (
+      <th className={`py-3 px-4 ${widthClass} select-none`}>
+        <div className={`flex items-center gap-1.5 ${align === 'center' ? 'justify-center' : align === 'right' ? 'justify-end' : 'justify-start'}`}>
+          <button
+            type="button"
+            onClick={() => handleSort(field)}
+            className="flex items-center gap-1 text-[11px] font-bold text-slate-700 hover:text-[#01411C] uppercase tracking-wider transition-colors cursor-pointer group"
+            title={`Click title to arrange / sort by ${label} (${isSorted && sortDirection === 'asc' ? 'Descending' : 'Ascending'})`}
+          >
+            <span>{label}</span>
+            <span className="inline-flex items-center">
+              {isSorted ? (
+                sortDirection === 'asc' ? (
+                  <ArrowUp className="w-3.5 h-3.5 text-[#01411C] stroke-[2.5]" />
+                ) : (
+                  <ArrowDown className="w-3.5 h-3.5 text-[#01411C] stroke-[2.5]" />
+                )
+              ) : (
+                <ArrowUpDown className="w-3 h-3 text-slate-300 group-hover:text-slate-500 transition-colors" />
+              )}
+            </span>
+          </button>
+        </div>
+      </th>
+    );
+  };
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6 space-y-6">
@@ -348,12 +448,12 @@ export const LeasesDirectoryView: React.FC = () => {
               Small Scale Mining Concessions Directory
             </h2>
             <span className="text-xs text-slate-500 font-medium">
-              (Showing {filteredLeases.length} matching concessions)
+              (Showing {filteredLeases.length} matching concessions • Sorted by {sortField.toUpperCase()} {sortDirection.toUpperCase()})
             </span>
           </div>
 
           <span className="text-[11px] text-slate-500 hidden sm:inline">
-            Page {currentPage} of {totalPages}
+            Click any column header to arrange/sort • Page {currentPage} of {totalPages}
           </span>
         </div>
 
@@ -361,14 +461,16 @@ export const LeasesDirectoryView: React.FC = () => {
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse">
             <thead>
-              <tr className="bg-slate-100/70 border-b border-slate-200 text-[11px] font-bold text-slate-600 uppercase tracking-wider">
-                <th className="py-3 px-4 w-40">Concession ID</th>
-                <th className="py-3 px-4">Title &amp; Site</th>
-                <th className="py-3 px-3 text-center">Type</th>
-                <th className="py-3 px-4">Lessee / Company</th>
-                <th className="py-3 px-4">District &amp; Mineral</th>
-                <th className="py-3 px-3 text-center">Hearings on Record</th>
-                <th className="py-3 px-4 text-right">Actions</th>
+              <tr className="bg-slate-100/70 border-b border-slate-200">
+                {renderSortableHeader('Concession ID', 'id', { widthClass: 'w-40' })}
+                {renderSortableHeader('Title & Site', 'title')}
+                {renderSortableHeader('Type', 'type', { align: 'center' })}
+                {renderSortableHeader('Lessee / Company', 'lessee')}
+                {renderSortableHeader('District & Mineral', 'district')}
+                {renderSortableHeader('Hearings on Record', 'hearings', { align: 'center' })}
+                <th className="py-3 px-4 text-right text-[11px] font-bold text-slate-600 uppercase tracking-wider">
+                  Actions
+                </th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100 text-xs">
