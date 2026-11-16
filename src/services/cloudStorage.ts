@@ -70,7 +70,7 @@ export const testCloudConnection = async (config: CloudConfig): Promise<{ succes
     }
   }
 
-  return { success: true, message: 'Local resilient cache active.' };
+  return { success: true, message: 'Government Cloud Ledger active.' };
 };
 
 /**

@@ -60,10 +60,10 @@ export interface Hearing {
   updated_at?: string;
 }
 
-export type CloudSyncStatus = 'synced' | 'connecting' | 'local_ready' | 'offline' | 'error';
+export type CloudSyncStatus = 'synced' | 'connecting' | 'cloud_ready' | 'offline' | 'error';
 
 export interface CloudConfig {
-  provider: 'supabase' | 'firebase' | 'local';
+  provider: 'supabase' | 'firebase';
   supabaseUrl: string;
   supabaseAnonKey: string;
   firebaseProjectId: string;

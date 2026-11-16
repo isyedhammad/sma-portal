@@ -15,7 +15,8 @@ import {
   AlertCircle,
   Building,
   Coins,
-  ArrowRight
+  ArrowRight,
+  Trash2
 } from 'lucide-react';
 
 export const HearingHistoryDrawer: React.FC = () => {
@@ -25,7 +26,8 @@ export const HearingHistoryDrawer: React.FC = () => {
     getHearingsForLease,
     openScheduleModal,
     openOutcomeModal,
-    updateHearing
+    updateHearing,
+    deleteHearing
   } = usePortal();
 
   // Track which hearing is currently being edited inline
@@ -274,13 +276,26 @@ export const HearingHistoryDrawer: React.FC = () => {
                             {getStatusBadge(h.hearing_status)}
                             
                             {!isBeingEdited ? (
-                              <button
-                                onClick={() => startInlineEdit(h)}
-                                className="p-1 text-slate-400 hover:text-emerald-700 hover:bg-emerald-50 rounded transition-colors"
-                                title="Edit remarks or order inline"
-                              >
-                                <Edit3 className="w-3.5 h-3.5" />
-                              </button>
+                              <div className="flex items-center gap-1">
+                                <button
+                                  onClick={() => startInlineEdit(h)}
+                                  className="p-1 text-slate-400 hover:text-emerald-700 hover:bg-emerald-50 rounded transition-colors"
+                                  title="Edit remarks or order inline"
+                                >
+                                  <Edit3 className="w-3.5 h-3.5" />
+                                </button>
+                                <button
+                                  onClick={async () => {
+                                    if (window.confirm(`Are you sure you want to permanently delete hearing ${h.hearing_id} (${h.hearing_date}) from cloud records?`)) {
+                                      await deleteHearing(h.hearing_id);
+                                    }
+                                  }}
+                                  className="p-1 text-slate-400 hover:text-red-700 hover:bg-red-50 rounded transition-colors"
+                                  title="Delete / cancel this hearing record from cloud"
+                                >
+                                  <Trash2 className="w-3.5 h-3.5" />
+                                </button>
+                              </div>
                             ) : null}
                           </div>
                         </div>

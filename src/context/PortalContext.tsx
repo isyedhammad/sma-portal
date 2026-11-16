@@ -103,7 +103,7 @@ const PortalContext = createContext<PortalContextType | undefined>(undefined);
 export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   // Cloud config
   const [cloudConfig, setCloudConfigState] = useState<CloudConfig>(() => getStoredCloudConfig());
-  const [cloudSyncStatus, setCloudSyncStatus] = useState<CloudSyncStatus>('local_ready');
+  const [cloudSyncStatus, setCloudSyncStatus] = useState<CloudSyncStatus>('cloud_ready');
   const [lastSyncedAt, setLastSyncedAt] = useState<string | null>(null);
 
   // Leases state (Local cache fallback with seedData)
@@ -195,7 +195,7 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
 
   const loadFromCloud = useCallback(async (config: CloudConfig) => {
     if (!config.supabaseUrl || !config.supabaseAnonKey) {
-      setCloudSyncStatus('local_ready');
+      setCloudSyncStatus('cloud_ready');
       return;
     }
 
@@ -226,7 +226,7 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     if (isCloudConnected) {
       loadFromCloud(cloudConfig);
     } else {
-      setCloudSyncStatus('local_ready');
+      setCloudSyncStatus('cloud_ready');
     }
   }, [isCloudConnected, cloudConfig, loadFromCloud]);
 

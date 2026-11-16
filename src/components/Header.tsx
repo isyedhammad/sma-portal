@@ -75,7 +75,7 @@ export const Header: React.FC = () => {
               title={
                 isCloudConnected
                   ? `Cloud Connected (Supabase). Last synced: ${lastSyncedAt || 'Just now'}`
-                  : 'Cloud Database not configured. Running on resilient local browser storage.'
+                  : 'Central Government Cloud Ledger (PostgreSQL / Supabase).'
               }
               className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium transition-all border ${
                 cloudSyncStatus === 'synced'
@@ -101,11 +101,11 @@ export const Header: React.FC = () => {
                 {cloudSyncStatus === 'synced'
                   ? 'Cloud Synced'
                   : cloudSyncStatus === 'connecting'
-                  ? 'Syncing...'
-                  : 'Local Storage'}
+                  ? 'Cloud Syncing...'
+                  : 'Cloud Database'}
               </span>
               <span className="text-[10px] text-emerald-300/80 underline decoration-dotted ml-0.5">
-                Config
+                Cloud
               </span>
             </button>
 

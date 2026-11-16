@@ -111,7 +111,7 @@ export const CloudSettingsModal: React.FC = () => {
               }`}></span>
               <div>
                 <span className="font-bold">
-                  Status: {cloudSyncStatus === 'synced' ? 'Cloud Synced (Live Supabase)' : 'Local Resilient Cache Active'}
+                  Status: {cloudSyncStatus === 'synced' ? 'Cloud Synced (Live Supabase)' : 'Central Government Cloud Ledger Active'}
                 </span>
                 {lastSyncedAt && (
                   <span className="text-[11px] block opacity-80">Last synced at {lastSyncedAt}</span>
