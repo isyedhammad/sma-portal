@@ -18,25 +18,12 @@ import {
   ArrowDown
 } from 'lucide-react';
 
-type LeaseSortField = 'title' | 'site' | 'type' | 'lessee' | 'district' | 'mineral' | 'hearings';
+type LeaseSortField = 'title' | 'type' | 'lessee' | 'district' | 'mineral' | 'hearings';
 type SortDirection = 'asc' | 'desc';
 
-// Helper function to cleanly extract separate Title and Site
-export const getTitleAndSite = (lease: Lease) => {
-  const site = lease.site_code || (lease.lease_title.match(/\((.*?)\)/)?.[1] ?? '');
-  let title = lease.lease_title;
-  if (site && title.includes(`(${site})`)) {
-    title = title.replace(`(${site})`, '').trim();
-  } else {
-    const match = title.match(/^(.*?)\s*\((.*)\)\s*$/);
-    if (match && match[1]) {
-      title = match[1].trim();
-    }
-  }
-  return {
-    title: title || lease.lease_title,
-    site: site || '—'
-  };
+// Helper function to extract concession display Title (formerly designated as Site)
+export const getLeaseDisplayTitle = (lease: Lease) => {
+  return lease.site_code || (lease.lease_title.match(/\((.*?)\)/)?.[1] ?? lease.lease_title);
 };
 
 export const LeasesDirectoryView: React.FC = () => {
@@ -123,10 +110,9 @@ export const LeasesDirectoryView: React.FC = () => {
         // 1. Text Search
         if (searchTerm.trim()) {
           const q = searchTerm.toLowerCase();
-          const { title, site } = getTitleAndSite(l);
+          const displayTitle = getLeaseDisplayTitle(l).toLowerCase();
           const match =
-            title.toLowerCase().includes(q) ||
-            site.toLowerCase().includes(q) ||
+            displayTitle.includes(q) ||
             l.lease_title.toLowerCase().includes(q) ||
             (l.site_code && l.site_code.toLowerCase().includes(q)) ||
             l.lease_no.toLowerCase().includes(q) ||
@@ -158,13 +144,9 @@ export const LeasesDirectoryView: React.FC = () => {
       .sort((a, b) => {
         let cmp = 0;
         if (sortField === 'title') {
-          const tA = getTitleAndSite(a).title;
-          const tB = getTitleAndSite(b).title;
-          cmp = tA.localeCompare(tB);
-        } else if (sortField === 'site') {
-          const sA = getTitleAndSite(a).site;
-          const sB = getTitleAndSite(b).site;
-          cmp = sA.localeCompare(sB, undefined, { numeric: true });
+          const tA = getLeaseDisplayTitle(a);
+          const tB = getLeaseDisplayTitle(b);
+          cmp = tA.localeCompare(tB, undefined, { numeric: true });
         } else if (sortField === 'type') {
           const typeA = a.mining_type || (a.lease_title.includes('PL') ? 'PL' : 'ML');
           const typeB = b.mining_type || (b.lease_title.includes('PL') ? 'PL' : 'ML');
@@ -490,8 +472,7 @@ export const LeasesDirectoryView: React.FC = () => {
           <table className="w-full text-left border-collapse">
             <thead>
               <tr className="bg-slate-100/70 border-b border-slate-200">
-                {renderSortableHeader('Title', 'title', { widthClass: 'w-48' })}
-                {renderSortableHeader('Site', 'site', { widthClass: 'w-64' })}
+                {renderSortableHeader('Title', 'title')}
                 {renderSortableHeader('Type', 'type', { align: 'center' })}
                 {renderSortableHeader('Lessee / Company', 'lessee')}
                 {renderSortableHeader('District', 'district')}
@@ -506,7 +487,7 @@ export const LeasesDirectoryView: React.FC = () => {
               {paginatedLeases.map((lease) => {
                 const hearingsList = getHearingsForLease(lease.lease_id);
                 const isPL = lease.mining_type === 'PL' || lease.lease_title.includes('PL') || lease.lease_no.includes('PL');
-                const { title, site } = getTitleAndSite(lease);
+                const displayTitle = getLeaseDisplayTitle(lease);
 
                 return (
                   <tr
@@ -515,18 +496,10 @@ export const LeasesDirectoryView: React.FC = () => {
                     className="hover:bg-emerald-50/40 cursor-pointer transition-colors group"
                   >
                     {/* Title */}
-                    <td className="py-3.5 px-4 font-bold text-[#01411C] group-hover:underline whitespace-nowrap">
-                      {title}
-                    </td>
-
-                    {/* Site */}
-                    <td className="py-3.5 px-4">
-                      <span
-                        className="font-mono text-xs text-slate-800 bg-slate-100 border border-slate-200/90 px-2.5 py-1 rounded-md inline-block max-w-sm truncate font-medium"
-                        title={site}
-                      >
-                        {site}
-                      </span>
+                    <td className="py-3.5 px-4 font-bold text-[#01411C] group-hover:underline">
+                      <div className="line-clamp-1 max-w-sm font-semibold" title={displayTitle}>
+                        {displayTitle}
+                      </div>
                     </td>
 
                     {/* Mining Type (ML vs PL) */}

@@ -19,7 +19,6 @@ export const AddLeaseModal: React.FC = () => {
 
   const [leaseNo, setLeaseNo] = useState('');
   const [leaseTitle, setLeaseTitle] = useState('');
-  const [siteCode, setSiteCode] = useState('');
   const [lesseeName, setLesseeName] = useState('');
   const [miningType, setMiningType] = useState<MiningType>('ML');
   const [district, setDistrict] = useState('Attock');
@@ -38,12 +37,11 @@ export const AddLeaseModal: React.FC = () => {
     setIsSubmitting(true);
     try {
       const generatedId = leaseNo.trim() || `SMA-${district.substring(0, 3).toUpperCase()}-${Date.now().toString().slice(-4)}`;
-      const formattedTitle = siteCode.trim() ? `${leaseTitle.trim()} (${siteCode.trim()})` : leaseTitle.trim();
       await addLease({
         lease_id: generatedId,
         lease_no: generatedId,
-        lease_title: formattedTitle,
-        site_code: siteCode.trim() || leaseTitle.trim(),
+        lease_title: leaseTitle.trim(),
+        site_code: leaseTitle.trim(),
         lessee_name: lesseeName.trim(),
         mining_type: miningType,
         district,
@@ -58,7 +56,6 @@ export const AddLeaseModal: React.FC = () => {
       // Reset
       setLeaseNo('');
       setLeaseTitle('');
-      setSiteCode('');
       setLesseeName('');
     } finally {
       setIsSubmitting(false);
@@ -96,34 +93,18 @@ export const AddLeaseModal: React.FC = () => {
         {/* Form Body */}
         <form onSubmit={handleSubmit} className="p-6 space-y-3.5 text-xs">
           
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <label className="font-semibold text-slate-700 block mb-1">
-                Concession Title *
-              </label>
-              <input
-                type="text"
-                required
-                placeholder="e.g. Limestone Concession"
-                value={leaseTitle}
-                onChange={(e) => setLeaseTitle(e.target.value)}
-                className="w-full border border-slate-300 rounded-lg p-2 bg-white text-slate-800 font-semibold"
-              />
-            </div>
-
-            <div>
-              <label className="font-semibold text-slate-700 block mb-1">
-                Site / Location *
-              </label>
-              <input
-                type="text"
-                required
-                placeholder="e.g. Hassanabdal 13-D or Bolianwal"
-                value={siteCode}
-                onChange={(e) => setSiteCode(e.target.value)}
-                className="w-full border border-slate-300 rounded-lg p-2 bg-white text-slate-800 font-mono"
-              />
-            </div>
+          <div>
+            <label className="font-semibold text-slate-700 block mb-1">
+              Concession Title *
+            </label>
+            <input
+              type="text"
+              required
+              placeholder="e.g. Hassanabdal 13-D or ML-ATK-Limestone-Jhang-6"
+              value={leaseTitle}
+              onChange={(e) => setLeaseTitle(e.target.value)}
+              className="w-full border border-slate-300 rounded-lg p-2 bg-white text-slate-800 font-semibold"
+            />
           </div>
 
           <div className="grid grid-cols-2 gap-3">

@@ -179,20 +179,20 @@ export const BulkUploadModal: React.FC = () => {
                   <thead className="bg-slate-100 border-b border-slate-200 text-slate-600 font-bold uppercase">
                     <tr>
                       <th className="p-2">Title</th>
-                      <th className="p-2">Site</th>
                       <th className="p-2">Type</th>
                       <th className="p-2">Lessee</th>
                       <th className="p-2">District</th>
+                      <th className="p-2">Mineral</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-100">
                     {parsedLeases.slice(0, 5).map((l, i) => (
                       <tr key={i} className="hover:bg-slate-50">
-                        <td className="p-2 font-bold text-[#01411C] line-clamp-1">{l.lease_title}</td>
-                        <td className="p-2 font-mono text-slate-700">{l.site_code || '—'}</td>
+                        <td className="p-2 font-bold text-[#01411C] line-clamp-1">{l.site_code || l.lease_title}</td>
                         <td className="p-2 font-bold">{l.mining_type}</td>
                         <td className="p-2 text-slate-600">{l.lessee_name}</td>
                         <td className="p-2">{l.district}</td>
+                        <td className="p-2">{l.mineral}</td>
                       </tr>
                     ))}
                   </tbody>
