@@ -5,8 +5,7 @@ import {
   FolderKanban,
   Printer,
   Plus,
-  Scale,
-  BookOpen
+  Scale
 } from 'lucide-react';
 
 export const Header: React.FC = () => {
@@ -14,7 +13,6 @@ export const Header: React.FC = () => {
     activeTab,
     setActiveTab,
     setIsCauseListModalOpen,
-    setIsRulesModalOpen,
     openScheduleModal,
     summaryStats
   } = usePortal();
@@ -58,18 +56,8 @@ export const Header: React.FC = () => {
             </div>
           </div>
 
-          {/* Right Header Controls: Rules PDF + Quick CTAs */}
+          {/* Right Header Controls: Cause List + Schedule Hearing */}
           <div className="flex items-center gap-2.5 self-start md:self-auto flex-wrap">
-            {/* Rules 2002 PDF Button */}
-            <button
-              onClick={() => setIsRulesModalOpen(true)}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-emerald-900/80 hover:bg-emerald-800 text-emerald-100 border border-emerald-600/60 transition-all shadow-xs"
-              title="View and download Punjab Mining Concession Rules 2002 (PDF)"
-            >
-              <BookOpen className="w-3.5 h-3.5 text-emerald-300" />
-              <span>Rules 2002 (PDF)</span>
-            </button>
-
             {/* Quick Cause List Print Button */}
             <button
               onClick={() => setIsCauseListModalOpen(true)}
