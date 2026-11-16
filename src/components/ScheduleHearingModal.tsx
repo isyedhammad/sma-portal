@@ -84,7 +84,7 @@ export const ScheduleHearingModal: React.FC = () => {
         status: 'Active',
         mining_type: hearingToEdit.lease_title.includes('PL') ? 'PL' : 'ML'
       });
-      setLeaseSearchQuery(hearingToEdit.lease_no);
+      setLeaseSearchQuery(getCleanDisplayTitle(hearingToEdit.lease_title, hearingToEdit.lease_no));
       setHearingDate(hearingToEdit.hearing_date);
       setHearingTime(hearingToEdit.hearing_time || '10:30 AM');
       setCustomPurpose(hearingToEdit.purpose);
@@ -97,7 +97,7 @@ export const ScheduleHearingModal: React.FC = () => {
     } else if (selectedLeaseForSchedule) {
       // Pre-filled with specific lease
       setSelectedLease(selectedLeaseForSchedule);
-      setLeaseSearchQuery(selectedLeaseForSchedule.lease_no);
+      setLeaseSearchQuery(getCleanDisplayTitle(selectedLeaseForSchedule.lease_title, selectedLeaseForSchedule.lease_no));
       setNoticeRef(`DGM&M/SMA/H-${Math.floor(100 + Math.random() * 900)}/2026`);
       setHearingDate('2026-11-16');
       setCustomPurpose(COMMON_VIOLATIONS[0]);
@@ -116,14 +116,15 @@ export const ScheduleHearingModal: React.FC = () => {
 
   // Autocomplete suggestions (max 8)
   const filteredLeaseSuggestions = useMemo(() => {
-    if (!leaseSearchQuery.trim() || selectedLease?.lease_no === leaseSearchQuery) {
+    const currentSelectedTitle = selectedLease ? getCleanDisplayTitle(selectedLease.lease_title, selectedLease.lease_no) : '';
+    if (!leaseSearchQuery.trim() || currentSelectedTitle.toLowerCase() === leaseSearchQuery.trim().toLowerCase()) {
       return [];
     }
     const q = leaseSearchQuery.toLowerCase();
     return leases
       .filter(
         l =>
-          l.lease_no.toLowerCase().includes(q) ||
+          getCleanDisplayTitle(l.lease_title, l.lease_no).toLowerCase().includes(q) ||
           l.lease_title.toLowerCase().includes(q) ||
           l.lessee_name.toLowerCase().includes(q) ||
           l.district.toLowerCase().includes(q) ||
@@ -142,7 +143,7 @@ export const ScheduleHearingModal: React.FC = () => {
 
   const handleSelectLease = (lease: Lease) => {
     setSelectedLease(lease);
-    setLeaseSearchQuery(lease.lease_no);
+    setLeaseSearchQuery(getCleanDisplayTitle(lease.lease_title, lease.lease_no));
     setIsDropdownOpen(false);
     setIsInlineCreateMode(false);
   };
@@ -259,7 +260,7 @@ export const ScheduleHearingModal: React.FC = () => {
                 <Search className="w-4 h-4 text-slate-400 absolute left-3 top-3" />
                 <input
                   type="text"
-                  placeholder="Type Lease ID (e.g. SMA-ATT-0001), Title, Lessee, District, or Mineral..."
+                  placeholder="Search by Concession Title, Lessee, District, or Mineral..."
                   value={leaseSearchQuery}
                   onChange={(e) => {
                     setLeaseSearchQuery(e.target.value);
@@ -279,13 +280,14 @@ export const ScheduleHearingModal: React.FC = () => {
                         className="p-2.5 hover:bg-emerald-50 cursor-pointer transition-colors text-xs"
                       >
                         <div className="flex items-center justify-between">
-                          <span className="font-bold text-[#01411C]">{item.lease_no}</span>
+                          <span className="font-bold text-[#01411C]">
+                            {getCleanDisplayTitle(item.lease_title, item.lease_no)}
+                          </span>
                           <span className="text-[10px] font-semibold px-1.5 py-0.2 bg-slate-100 rounded text-slate-700">
                             {item.mining_type || 'ML'} • {item.mineral}
                           </span>
                         </div>
-                        <div className="text-[11px] text-slate-700 font-medium line-clamp-1">{getCleanDisplayTitle(item.lease_title, item.lease_no)}</div>
-                        <div className="text-[10px] text-slate-400 mt-0.5">{item.lessee_name} • {item.district}</div>
+                        <div className="text-[10px] text-slate-500 mt-0.5">{item.lessee_name} • {item.district}</div>
                       </div>
                     ))}
                   </div>
@@ -294,14 +296,14 @@ export const ScheduleHearingModal: React.FC = () => {
                 {/* Inline Register Prompt if not found */}
                 {leaseSearchQuery.length >= 2 && filteredLeaseSuggestions.length === 0 && (
                   <div className="p-3 mt-1 bg-amber-50 rounded-lg border border-amber-200 flex items-center justify-between text-xs text-amber-900">
-                    <span>Lease "{leaseSearchQuery}" not found in current directory.</span>
+                    <span>Concession "{leaseSearchQuery}" not found in current directory.</span>
                     <button
                       type="button"
                       onClick={() => {
                         setIsInlineCreateMode(true);
                         setInlineLeaseData({
-                          lease_no: leaseSearchQuery.toUpperCase(),
-                          lease_title: `Mining Concession (${leaseSearchQuery.toUpperCase()})`,
+                          lease_no: `SMA-${Date.now().toString().slice(-4)}`,
+                          lease_title: leaseSearchQuery,
                           lessee_name: '',
                           district: 'Attock',
                           mineral: 'Limestone',
@@ -398,7 +400,9 @@ export const ScheduleHearingModal: React.FC = () => {
               <div className="bg-slate-50 rounded-lg border border-slate-200 p-3 text-xs space-y-1.5">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-1.5 font-bold text-slate-900">
-                    <span className="text-[#01411C] font-mono text-sm">{selectedLease.lease_no}</span>
+                    <span className="text-[#01411C] font-bold text-sm">
+                      {getCleanDisplayTitle(selectedLease.lease_title, selectedLease.lease_no)}
+                    </span>
                     <span className="px-1.5 py-0.2 rounded text-[10px] font-black bg-blue-100 text-blue-800">
                       {selectedLease.mining_type || 'ML'}
                     </span>
@@ -407,7 +411,6 @@ export const ScheduleHearingModal: React.FC = () => {
                     {selectedLease.district} • {selectedLease.mineral}
                   </span>
                 </div>
-                <div className="text-slate-800 font-medium line-clamp-1">{getCleanDisplayTitle(selectedLease.lease_title, selectedLease.lease_no)}</div>
                 <div className="text-slate-500 text-[11px] flex items-center gap-1">
                   <Building className="w-3 h-3 text-slate-400" />
                   <span>Lessee: {selectedLease.lessee_name}</span>

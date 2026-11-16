@@ -833,8 +833,8 @@ export const ScheduledHearingsDashboard: React.FC = () => {
                   <span className="font-mono font-bold">{hearingToDelete.notice_reference_no || hearingToDelete.hearing_id}</span>
                 </div>
                 <div>
-                  <span className="text-red-700 font-bold block text-[10px] uppercase">Concession No &amp; Lessee</span>
-                  <span>{hearingToDelete.lease_no} • {hearingToDelete.lessee_name}</span>
+                  <span className="text-red-700 font-bold block text-[10px] uppercase">Concession Title &amp; Lessee</span>
+                  <span>{getCleanDisplayTitle(hearingToDelete.lease_title, hearingToDelete.lease_no)} • {hearingToDelete.lessee_name}</span>
                 </div>
                 <div>
                   <span className="text-red-700 font-bold block text-[10px] uppercase">Scheduled Date &amp; Time</span>

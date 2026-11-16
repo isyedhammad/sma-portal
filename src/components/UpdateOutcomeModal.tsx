@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { usePortal } from '../context/PortalContext';
 import { Hearing, HearingStatus } from '../types';
+import { getCleanDisplayTitle } from './ScheduledHearingsDashboard';
 import {
   X,
   Gavel,
@@ -98,7 +99,7 @@ export const UpdateOutcomeModal: React.FC = () => {
                 Update Hearing Bench Outcome &amp; Orders
               </h2>
               <p className="text-xs text-emerald-200">
-                {selectedHearingForOutcome.lease_no} • Notice Ref: {selectedHearingForOutcome.notice_reference_no || 'N/A'}
+                {getCleanDisplayTitle(selectedHearingForOutcome.lease_title, selectedHearingForOutcome.lease_no)} • Notice Ref: {selectedHearingForOutcome.notice_reference_no || 'N/A'}
               </p>
             </div>
           </div>
