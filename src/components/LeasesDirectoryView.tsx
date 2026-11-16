@@ -18,8 +18,26 @@ import {
   ArrowDown
 } from 'lucide-react';
 
-type LeaseSortField = 'id' | 'title' | 'type' | 'lessee' | 'district' | 'mineral' | 'hearings';
+type LeaseSortField = 'title' | 'site' | 'type' | 'lessee' | 'district' | 'mineral' | 'hearings';
 type SortDirection = 'asc' | 'desc';
+
+// Helper function to cleanly extract separate Title and Site
+export const getTitleAndSite = (lease: Lease) => {
+  const site = lease.site_code || (lease.lease_title.match(/\((.*?)\)/)?.[1] ?? '');
+  let title = lease.lease_title;
+  if (site && title.includes(`(${site})`)) {
+    title = title.replace(`(${site})`, '').trim();
+  } else {
+    const match = title.match(/^(.*?)\s*\((.*)\)\s*$/);
+    if (match && match[1]) {
+      title = match[1].trim();
+    }
+  }
+  return {
+    title: title || lease.lease_title,
+    site: site || '—'
+  };
+};
 
 export const LeasesDirectoryView: React.FC = () => {
   const {
@@ -40,7 +58,7 @@ export const LeasesDirectoryView: React.FC = () => {
   const pageSize = 25;
 
   // Sorting State
-  const [sortField, setSortField] = useState<LeaseSortField>('id');
+  const [sortField, setSortField] = useState<LeaseSortField>('title');
   const [sortDirection, setSortDirection] = useState<SortDirection>('asc');
 
   const handleSort = (field: LeaseSortField) => {
@@ -105,9 +123,13 @@ export const LeasesDirectoryView: React.FC = () => {
         // 1. Text Search
         if (searchTerm.trim()) {
           const q = searchTerm.toLowerCase();
+          const { title, site } = getTitleAndSite(l);
           const match =
-            l.lease_no.toLowerCase().includes(q) ||
+            title.toLowerCase().includes(q) ||
+            site.toLowerCase().includes(q) ||
             l.lease_title.toLowerCase().includes(q) ||
+            (l.site_code && l.site_code.toLowerCase().includes(q)) ||
+            l.lease_no.toLowerCase().includes(q) ||
             l.lessee_name.toLowerCase().includes(q) ||
             l.district.toLowerCase().includes(q) ||
             l.mineral.toLowerCase().includes(q);
@@ -135,10 +157,14 @@ export const LeasesDirectoryView: React.FC = () => {
       })
       .sort((a, b) => {
         let cmp = 0;
-        if (sortField === 'id') {
-          cmp = a.lease_no.localeCompare(b.lease_no, undefined, { numeric: true });
-        } else if (sortField === 'title') {
-          cmp = a.lease_title.localeCompare(b.lease_title);
+        if (sortField === 'title') {
+          const tA = getTitleAndSite(a).title;
+          const tB = getTitleAndSite(b).title;
+          cmp = tA.localeCompare(tB);
+        } else if (sortField === 'site') {
+          const sA = getTitleAndSite(a).site;
+          const sB = getTitleAndSite(b).site;
+          cmp = sA.localeCompare(sB, undefined, { numeric: true });
         } else if (sortField === 'type') {
           const typeA = a.mining_type || (a.lease_title.includes('PL') ? 'PL' : 'ML');
           const typeB = b.mining_type || (b.lease_title.includes('PL') ? 'PL' : 'ML');
@@ -464,8 +490,8 @@ export const LeasesDirectoryView: React.FC = () => {
           <table className="w-full text-left border-collapse">
             <thead>
               <tr className="bg-slate-100/70 border-b border-slate-200">
-                {renderSortableHeader('Concession ID', 'id', { widthClass: 'w-36' })}
-                {renderSortableHeader('Title & Site', 'title')}
+                {renderSortableHeader('Title', 'title', { widthClass: 'w-48' })}
+                {renderSortableHeader('Site', 'site', { widthClass: 'w-64' })}
                 {renderSortableHeader('Type', 'type', { align: 'center' })}
                 {renderSortableHeader('Lessee / Company', 'lessee')}
                 {renderSortableHeader('District', 'district')}
@@ -480,6 +506,7 @@ export const LeasesDirectoryView: React.FC = () => {
               {paginatedLeases.map((lease) => {
                 const hearingsList = getHearingsForLease(lease.lease_id);
                 const isPL = lease.mining_type === 'PL' || lease.lease_title.includes('PL') || lease.lease_no.includes('PL');
+                const { title, site } = getTitleAndSite(lease);
 
                 return (
                   <tr
@@ -487,21 +514,19 @@ export const LeasesDirectoryView: React.FC = () => {
                     onClick={() => openDrawerForLease(lease.lease_id)}
                     className="hover:bg-emerald-50/40 cursor-pointer transition-colors group"
                   >
-                    {/* Concession ID */}
-                    <td className="py-3.5 px-4 font-mono font-bold text-[#01411C] group-hover:underline whitespace-nowrap">
-                      {lease.lease_no}
+                    {/* Title */}
+                    <td className="py-3.5 px-4 font-bold text-[#01411C] group-hover:underline whitespace-nowrap">
+                      {title}
                     </td>
 
-                    {/* Title & Site */}
+                    {/* Site */}
                     <td className="py-3.5 px-4">
-                      <div className="font-semibold text-slate-900 line-clamp-1 max-w-sm">
-                        {lease.lease_title}
-                      </div>
-                      {lease.site_code && (
-                        <div className="text-[10px] text-slate-400 font-mono mt-0.5">
-                          Site: {lease.site_code}
-                        </div>
-                      )}
+                      <span
+                        className="font-mono text-xs text-slate-800 bg-slate-100 border border-slate-200/90 px-2.5 py-1 rounded-md inline-block max-w-sm truncate font-medium"
+                        title={site}
+                      >
+                        {site}
+                      </span>
                     </td>
 
                     {/* Mining Type (ML vs PL) */}

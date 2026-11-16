@@ -19,6 +19,7 @@ export const AddLeaseModal: React.FC = () => {
 
   const [leaseNo, setLeaseNo] = useState('');
   const [leaseTitle, setLeaseTitle] = useState('');
+  const [siteCode, setSiteCode] = useState('');
   const [lesseeName, setLesseeName] = useState('');
   const [miningType, setMiningType] = useState<MiningType>('ML');
   const [district, setDistrict] = useState('Attock');
@@ -36,10 +37,13 @@ export const AddLeaseModal: React.FC = () => {
     e.preventDefault();
     setIsSubmitting(true);
     try {
+      const generatedId = leaseNo.trim() || `SMA-${district.substring(0, 3).toUpperCase()}-${Date.now().toString().slice(-4)}`;
+      const formattedTitle = siteCode.trim() ? `${leaseTitle.trim()} (${siteCode.trim()})` : leaseTitle.trim();
       await addLease({
-        lease_id: leaseNo.trim(),
-        lease_no: leaseNo.trim(),
-        lease_title: leaseTitle.trim(),
+        lease_id: generatedId,
+        lease_no: generatedId,
+        lease_title: formattedTitle,
+        site_code: siteCode.trim() || leaseTitle.trim(),
         lessee_name: lesseeName.trim(),
         mining_type: miningType,
         district,
@@ -54,6 +58,7 @@ export const AddLeaseModal: React.FC = () => {
       // Reset
       setLeaseNo('');
       setLeaseTitle('');
+      setSiteCode('');
       setLesseeName('');
     } finally {
       setIsSubmitting(false);
@@ -94,18 +99,34 @@ export const AddLeaseModal: React.FC = () => {
           <div className="grid grid-cols-2 gap-3">
             <div>
               <label className="font-semibold text-slate-700 block mb-1">
-                Concession ID / Lease No *
+                Concession Title *
               </label>
               <input
                 type="text"
                 required
-                placeholder="e.g. SMA-ATT-0099"
-                value={leaseNo}
-                onChange={(e) => setLeaseNo(e.target.value)}
-                className="w-full border border-slate-300 rounded-lg p-2 bg-white text-slate-800 font-mono"
+                placeholder="e.g. Limestone Concession"
+                value={leaseTitle}
+                onChange={(e) => setLeaseTitle(e.target.value)}
+                className="w-full border border-slate-300 rounded-lg p-2 bg-white text-slate-800 font-semibold"
               />
             </div>
 
+            <div>
+              <label className="font-semibold text-slate-700 block mb-1">
+                Site / Location *
+              </label>
+              <input
+                type="text"
+                required
+                placeholder="e.g. Hassanabdal 13-D or Bolianwal"
+                value={siteCode}
+                onChange={(e) => setSiteCode(e.target.value)}
+                className="w-full border border-slate-300 rounded-lg p-2 bg-white text-slate-800 font-mono"
+              />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-3">
             <div>
               <label className="font-semibold text-slate-700 block mb-1">
                 Concession Category *
@@ -119,20 +140,19 @@ export const AddLeaseModal: React.FC = () => {
                 <option value="PL">PL - Prospecting License</option>
               </select>
             </div>
-          </div>
 
-          <div>
-            <label className="font-semibold text-slate-700 block mb-1">
-              Concession Title &amp; Location *
-            </label>
-            <input
-              type="text"
-              required
-              placeholder="e.g. Limestone Quarry Block No. 4, Hasanabdal Hills"
-              value={leaseTitle}
-              onChange={(e) => setLeaseTitle(e.target.value)}
-              className="w-full border border-slate-300 rounded-lg p-2 bg-white text-slate-800"
-            />
+            <div>
+              <label className="font-semibold text-slate-700 block mb-1">
+                Concession File No (Optional)
+              </label>
+              <input
+                type="text"
+                placeholder="Auto-generated if left blank"
+                value={leaseNo}
+                onChange={(e) => setLeaseNo(e.target.value)}
+                className="w-full border border-slate-300 rounded-lg p-2 bg-white text-slate-800 font-mono text-[11px]"
+              />
+            </div>
           </div>
 
           <div>

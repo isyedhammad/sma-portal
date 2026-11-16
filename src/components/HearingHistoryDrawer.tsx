@@ -143,11 +143,16 @@ export const HearingHistoryDrawer: React.FC = () => {
                   </span>
                 </div>
                 <h2 className="text-xl font-bold tracking-tight text-white mt-1">
-                  {selectedLeaseForDrawer.lease_no}
-                </h2>
-                <p className="text-xs text-emerald-100/90 font-medium mt-0.5 line-clamp-1">
                   {selectedLeaseForDrawer.lease_title}
-                </p>
+                </h2>
+                {selectedLeaseForDrawer.site_code && (
+                  <div className="flex items-center gap-1.5 mt-1">
+                    <span className="text-[10px] text-emerald-300 uppercase font-semibold">Site:</span>
+                    <span className="font-mono text-xs text-white bg-emerald-900/80 px-2 py-0.5 rounded border border-emerald-700/60 font-semibold">
+                      {selectedLeaseForDrawer.site_code}
+                    </span>
+                  </div>
+                )}
               </div>
 
               {/* Close Button */}

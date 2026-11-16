@@ -45,8 +45,9 @@ export const BulkUploadModal: React.FC = () => {
         const headers = lines[0].split(',').map(h => h.trim().toLowerCase().replace(/['"]/g, ''));
 
         // Identify column indices
-        const leaseNoIdx = headers.findIndex(h => h.includes('id') || h.includes('lease') || h.includes('site') || h.includes('code'));
-        const titleIdx = headers.findIndex(h => h.includes('title') || h.includes('name') || h.includes('location'));
+        const leaseNoIdx = headers.findIndex(h => h.includes('id') || h.includes('lease_no') || h.includes('file'));
+        const titleIdx = headers.findIndex(h => h.includes('title') || h.includes('concession'));
+        const siteIdx = headers.findIndex(h => h.includes('site') || h.includes('location') || h.includes('block') || h.includes('area'));
         const lesseeIdx = headers.findIndex(h => h.includes('lessee') || h.includes('company') || h.includes('developer'));
         const districtIdx = headers.findIndex(h => h.includes('district') || h.includes('city'));
         const mineralIdx = headers.findIndex(h => h.includes('mineral'));
@@ -58,7 +59,9 @@ export const BulkUploadModal: React.FC = () => {
           if (row.length < 3) continue;
 
           const leaseNo = (leaseNoIdx !== -1 && row[leaseNoIdx]) ? row[leaseNoIdx] : `SMA-IMP-${i}`;
-          const title = (titleIdx !== -1 && row[titleIdx]) ? row[titleIdx] : `Mining Concession ${leaseNo}`;
+          const site = (siteIdx !== -1 && row[siteIdx]) ? row[siteIdx] : '';
+          const rawTitle = (titleIdx !== -1 && row[titleIdx]) ? row[titleIdx] : `Mining Concession ${leaseNo}`;
+          const title = site && !rawTitle.includes(site) ? `${rawTitle} (${site})` : rawTitle;
           const lessee = (lesseeIdx !== -1 && row[lesseeIdx]) ? row[lesseeIdx] : 'Authorized Concession Holder';
           const district = (districtIdx !== -1 && row[districtIdx]) ? row[districtIdx] : 'Attock';
           const mineral = (mineralIdx !== -1 && row[mineralIdx]) ? row[mineralIdx] : 'Limestone';
@@ -68,6 +71,7 @@ export const BulkUploadModal: React.FC = () => {
             lease_id: leaseNo,
             lease_no: leaseNo,
             lease_title: title,
+            site_code: site || undefined,
             lessee_name: lessee,
             district,
             mineral,
@@ -174,8 +178,8 @@ export const BulkUploadModal: React.FC = () => {
                 <table className="w-full text-left border-collapse text-[11px]">
                   <thead className="bg-slate-100 border-b border-slate-200 text-slate-600 font-bold uppercase">
                     <tr>
-                      <th className="p-2">Lease No</th>
                       <th className="p-2">Title</th>
+                      <th className="p-2">Site</th>
                       <th className="p-2">Type</th>
                       <th className="p-2">Lessee</th>
                       <th className="p-2">District</th>
@@ -184,8 +188,8 @@ export const BulkUploadModal: React.FC = () => {
                   <tbody className="divide-y divide-slate-100">
                     {parsedLeases.slice(0, 5).map((l, i) => (
                       <tr key={i} className="hover:bg-slate-50">
-                        <td className="p-2 font-mono font-bold text-[#01411C]">{l.lease_no}</td>
-                        <td className="p-2 font-medium line-clamp-1">{l.lease_title}</td>
+                        <td className="p-2 font-bold text-[#01411C] line-clamp-1">{l.lease_title}</td>
+                        <td className="p-2 font-mono text-slate-700">{l.site_code || '—'}</td>
                         <td className="p-2 font-bold">{l.mining_type}</td>
                         <td className="p-2 text-slate-600">{l.lessee_name}</td>
                         <td className="p-2">{l.district}</td>
