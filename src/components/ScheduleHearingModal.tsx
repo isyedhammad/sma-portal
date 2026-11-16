@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { usePortal } from '../context/PortalContext';
 import { Lease, Hearing } from '../types';
+import { getCleanDisplayTitle } from './ScheduledHearingsDashboard';
 import {
   X,
   Calendar,
@@ -283,7 +284,7 @@ export const ScheduleHearingModal: React.FC = () => {
                             {item.mining_type || 'ML'} • {item.mineral}
                           </span>
                         </div>
-                        <div className="text-[11px] text-slate-700 font-medium line-clamp-1">{item.lease_title}</div>
+                        <div className="text-[11px] text-slate-700 font-medium line-clamp-1">{getCleanDisplayTitle(item.lease_title, item.lease_no)}</div>
                         <div className="text-[10px] text-slate-400 mt-0.5">{item.lessee_name} • {item.district}</div>
                       </div>
                     ))}
@@ -406,7 +407,7 @@ export const ScheduleHearingModal: React.FC = () => {
                     {selectedLease.district} • {selectedLease.mineral}
                   </span>
                 </div>
-                <div className="text-slate-800 font-medium line-clamp-1">{selectedLease.lease_title}</div>
+                <div className="text-slate-800 font-medium line-clamp-1">{getCleanDisplayTitle(selectedLease.lease_title, selectedLease.lease_no)}</div>
                 <div className="text-slate-500 text-[11px] flex items-center gap-1">
                   <Building className="w-3 h-3 text-slate-400" />
                   <span>Lessee: {selectedLease.lessee_name}</span>

@@ -28,6 +28,15 @@ type DateFilterType = 'today' | 'upcoming7' | 'all' | 'custom';
 type SortField = 'date' | 'title' | 'lessee' | 'district' | 'mineral' | 'purpose' | 'status';
 type SortDirection = 'asc' | 'desc';
 
+// Helper function to extract clean Title without repetitive "[Mineral] Concession" prefix
+export const getCleanDisplayTitle = (title?: string, fallback?: string) => {
+  if (!title) return fallback || '—';
+  const m = title.match(/^(?:.*?\s+Concession\s*\(|\()(.*)\)\s*$/i);
+  if (m && m[1]) return m[1].trim();
+  const stripped = title.replace(/^[A-Za-z-]+\s+Concession\s*/i, '').trim();
+  return stripped || title || fallback || '—';
+};
+
 export const ScheduledHearingsDashboard: React.FC = () => {
   const {
     hearings,
@@ -100,7 +109,9 @@ export const ScheduledHearingsDashboard: React.FC = () => {
         // 1. Text Search
         if (searchTerm.trim()) {
           const query = searchTerm.toLowerCase();
+          const cleanTitle = getCleanDisplayTitle(h.lease_title, h.lease_no).toLowerCase();
           const matchSearch =
+            cleanTitle.includes(query) ||
             h.lease_no.toLowerCase().includes(query) ||
             h.lease_title.toLowerCase().includes(query) ||
             h.lessee_name.toLowerCase().includes(query) ||
@@ -144,8 +155,8 @@ export const ScheduledHearingsDashboard: React.FC = () => {
           const timeB = new Date(b.hearing_date + 'T' + (b.hearing_time || '00:00')).getTime();
           cmp = isNaN(timeA) || isNaN(timeB) ? a.hearing_date.localeCompare(b.hearing_date) : timeA - timeB;
         } else if (sortField === 'title') {
-          const tA = a.lease_title || a.lease_no;
-          const tB = b.lease_title || b.lease_no;
+          const tA = getCleanDisplayTitle(a.lease_title, a.lease_no);
+          const tB = getCleanDisplayTitle(b.lease_title, b.lease_no);
           cmp = tA.localeCompare(tB, undefined, { numeric: true });
         } else if (sortField === 'lessee') {
           cmp = a.lessee_name.localeCompare(b.lessee_name);
@@ -669,7 +680,7 @@ export const ScheduledHearingsDashboard: React.FC = () => {
                       <td className="py-3.5 px-4">
                         <div className="flex items-center gap-1.5">
                           <span className="font-bold text-[#01411C] group-hover:underline">
-                            {h.lease_title || h.lease_no}
+                            {getCleanDisplayTitle(h.lease_title, h.lease_no)}
                           </span>
                           <span
                             className={`px-1.5 py-0.2 rounded text-[10px] font-black uppercase ${

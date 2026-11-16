@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { usePortal } from '../context/PortalContext';
 import { Hearing, HearingStatus } from '../types';
+import { getCleanDisplayTitle } from './ScheduledHearingsDashboard';
 import {
   X,
   Plus,
@@ -143,7 +144,7 @@ export const HearingHistoryDrawer: React.FC = () => {
                   </span>
                 </div>
                 <h2 className="text-xl font-bold tracking-tight text-white mt-1">
-                  {selectedLeaseForDrawer.site_code || selectedLeaseForDrawer.lease_title}
+                  {getCleanDisplayTitle(selectedLeaseForDrawer.site_code || selectedLeaseForDrawer.lease_title, selectedLeaseForDrawer.lease_no)}
                 </h2>
                 <p className="text-xs text-emerald-200/90 font-medium mt-0.5">
                   {selectedLeaseForDrawer.district} • {selectedLeaseForDrawer.mineral}

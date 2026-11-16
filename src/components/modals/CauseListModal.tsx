@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { usePortal } from '../../context/PortalContext';
+import { getCleanDisplayTitle } from '../ScheduledHearingsDashboard';
 import { X, Printer, Calendar, Clock, MapPin } from 'lucide-react';
 
 export const CauseListModal: React.FC = () => {
@@ -165,7 +166,7 @@ export const CauseListModal: React.FC = () => {
                         {h.notice_reference_no || 'N/A'}
                       </td>
                       <td className="p-2.5 font-bold text-[#01411C] border-r border-slate-200">
-                        <div className="font-semibold">{h.lease_title || h.lease_no}</div>
+                        <div className="font-semibold">{getCleanDisplayTitle(h.lease_title, h.lease_no)}</div>
                       </td>
                       <td className="p-2.5 font-medium text-slate-900 border-r border-slate-200">
                         {h.lessee_name}
