@@ -168,7 +168,7 @@ export const RulesModal: React.FC = () => {
           <div className="flex items-center gap-2">
             {/* Direct PDF Download Button */}
             <a
-              href="assets/docs/Punjab_Mining_Concession_Rules_2002.pdf"
+              href="./Punjab_Mining_Concession_Rules_2002.pdf"
               download="Punjab_Mining_Concession_Rules_2002.pdf"
               className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold bg-[#D4AF37] hover:bg-[#c49f29] text-slate-950 shadow-sm transition-all"
               title="Download official Rules PDF document"
@@ -179,7 +179,7 @@ export const RulesModal: React.FC = () => {
 
             {/* Open PDF in New Tab */}
             <a
-              href="assets/docs/Punjab_Mining_Concession_Rules_2002.pdf"
+              href="./Punjab_Mining_Concession_Rules_2002.pdf"
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-white/10 hover:bg-white/20 text-white border border-white/20 transition-all"
@@ -282,7 +282,7 @@ export const RulesModal: React.FC = () => {
 
           <div className="flex items-center gap-2">
             <a
-              href="assets/docs/Punjab_Mining_Concession_Rules_2002.pdf"
+              href="./Punjab_Mining_Concession_Rules_2002.pdf"
               download="Punjab_Mining_Concession_Rules_2002.pdf"
               className="text-[#01411C] hover:underline font-bold"
             >
